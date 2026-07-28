@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interro · UI/UX Prototypes</title>
+  <link rel="stylesheet" href="brand/tokens.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh;
+      font-family: var(--font-sans); color: var(--ink);
+      background: var(--interro-green);
+      display: flex; align-items: center; justify-content: center;
+      padding: 40px 24px;
+    }
+    .wrap { width: 100%; max-width: 680px; }
+    /* The supplied knockout asset is plated on accent green #339966, so it sits
+       inside a matching accent-green badge rather than bare on the deep-green
+       page (where the plate edge would read as a rendering fault). */
+    .logobadge {
+      display: inline-block;
+      background: var(--interro-accent);
+      padding: 16px 22px;
+      border-radius: var(--radius);
+      margin-bottom: 30px;
+      line-height: 0;
+    }
+    .logobadge img { height: 30px; width: auto; display: block; }
+    h1 { color: #fff; font-size: 30px; margin: 0 0 8px; font-weight: 650; letter-spacing: -0.015em; }
+    .tag {
+      font-family: var(--font-serif); color: var(--interro-accent);
+      font-size: 16px; margin: 0 0 34px; line-height: 1.5;
+    }
+    a.proto {
+      display: block; text-decoration: none;
+      background: #fff; border-radius: var(--radius-lg);
+      padding: 22px 24px; margin-bottom: 14px;
+      border-left: 4px solid var(--interro-accent);
+      transition: transform .15s, box-shadow .15s;
+    }
+    a.proto:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+    .proto h2 { margin: 0 0 6px; font-size: 17px; color: var(--interro-green); font-weight: 700; }
+    .proto p { margin: 0; font-size: 13.5px; color: var(--gray-500); line-height: 1.5; }
+    .proto .meta {
+      display: inline-block; margin-top: 12px; font-size: 11px; font-weight: 800;
+      letter-spacing: 0.07em; text-transform: uppercase;
+      color: var(--interro-accent); background: var(--interro-accent-soft);
+      padding: 4px 9px; border-radius: 100px;
+    }
+    footer { color: rgba(255,255,255,.45); font-size: 12.5px; margin-top: 28px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <span class="logobadge"><img src="brand/interro-logo-knockout.png" alt="interro" /></span>
+    <h1>UI / UX Prototypes</h1>
+    <p class="tag">Purpose-Built Platform for High Dollar, Multi-Party Transactions</p>
+
+    <a class="proto" href="prototypes/wire-details/index.html">
+      <h2>Capital Call Wire Instructions →</h2>
+      <p>
+        Investor-facing flow showing how Interro adapts wire details to the payment
+        route — SWIFT/BIC included for international wires, omitted for domestic,
+        with a required wire memo code in both cases.
+      </p>
+      <span class="meta">Marketing demo · 2 screens</span>
+    </a>
+
+    <footer>Prototypes contain fabricated demo data — not live payment instructions.</footer>
+  </div>
+</body>
+</html>

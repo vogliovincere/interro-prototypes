@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="interro-green">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interro · Capital Call Wire Instructions</title>
+  <link rel="stylesheet" href="../../brand/tokens.css" />
+  <link rel="stylesheet" href="app.css" />
+</head>
+<body>
+
+<div class="stage">
+
+  <!-- ======================================================================
+       DEV TOOLS — demo scaffolding, lives OUTSIDE the mobile frame.
+       Never ships; exists so the flow and its variants can be driven live.
+       ==================================================================== -->
+  <aside class="dev">
+    <div class="dev__title">Dev tools</div>
+
+    <section class="dev__group">
+      <p class="dev__label">Flow</p>
+      <div class="dev__nav">
+        <button class="dev__navitem" data-goto="choose">1 · Payment options</button>
+        <button class="dev__navitem" data-goto="domestic">2 · Domestic wire details</button>
+        <button class="dev__navitem" data-goto="international">2 · International wire details</button>
+      </div>
+    </section>
+
+    <section class="dev__group">
+      <p class="dev__label">Payment options layout</p>
+      <div class="dev__seg" data-seg="layout">
+        <button data-layout="stacked">Stacked</button>
+        <button data-layout="side">Side by side</button>
+      </div>
+    </section>
+
+    <section class="dev__group">
+      <p class="dev__label">Amount due treatment</p>
+      <div class="dev__seg dev__seg--col" data-seg="amount">
+        <button data-amount="band">Green band (reversed)</button>
+        <button data-amount="plain">White, dark green text</button>
+      </div>
+    </section>
+
+    <section class="dev__group">
+      <p class="dev__label">Due date placement</p>
+      <div class="dev__seg dev__seg--col" data-seg="due">
+        <button data-due="inline">Beside the amount</button>
+        <button data-due="row">Its own row</button>
+      </div>
+    </section>
+
+    <section class="dev__group">
+      <p class="dev__label">Payment options screen</p>
+      <label class="dev__check">
+        <input type="checkbox" id="dev-lp" />
+        <span>Show LP name under the GP name</span>
+      </label>
+    </section>
+
+    <section class="dev__group">
+      <p class="dev__label">Wire memo code</p>
+      <div class="dev__seg dev__seg--col" data-seg="memo">
+        <button data-memo="required">Required (gold)</button>
+        <button data-memo="recommended">Recommended (blue)</button>
+      </div>
+    </section>
+
+    <section class="dev__group">
+      <p class="dev__label">Details page</p>
+      <label class="dev__check">
+        <input type="checkbox" id="dev-addl" />
+        <span>“Additional Payment Information” accordion</span>
+      </label>
+    </section>
+
+    <section class="dev__group dev__group--last">
+      <button class="dev__reset" id="dev-reset">Reset demo</button>
+    </section>
+  </aside>
+
+  <!-- ======================================================================
+       MOBILE FRAME — Interro ships this UI as an embedded widget, so the
+       prototype is constrained to a true 390px viewport.
+       ==================================================================== -->
+  <div class="phone">
+    <div class="phone__scroll" id="scroll">
+
+      <header class="wtop">
+        <img class="wtop__logo" src="../../brand/interro-logo.png" alt="interro" />
+        <span class="wtop__ctx">Capital Call</span>
+      </header>
+
+      <!-- segmented step bar — lights up green as the flow advances -->
+      <div class="progress" id="progress" role="progressbar"
+           aria-valuemin="1" aria-valuemax="2" aria-label="Progress"></div>
+
+      <main id="app" class="screen"><!-- rendered by app.js --></main>
+
+      <footer class="powered">
+        <span>Powered by</span>
+        <img src="../../brand/interro-logo.png" alt="Interro" />
+      </footer>
+    </div>
+
+    <!-- modals render inside the frame, not over the whole page -->
+    <div class="modalroot" id="modal-root"></div>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </div>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

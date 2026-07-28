@@ -1,0 +1,56 @@
+/* ==========================================================================
+   Interro brand tokens
+   Source of truth: /brand-guidelines/*.png (holding-company deck, round 1, 2/24)
+   cross-checked against the `interro-branding` skill.
+   ========================================================================== */
+
+:root {
+  /* --- Core palette -------------------------------------------------- */
+  --interro-green: #123524;        /* Phthalo Green — PRIMARY brand color */
+  --interro-green-hover: #0c2418;
+  --interro-green-soft: #e6f0ea;
+  --interro-accent: #339966;       /* bright green — connector dots, links */
+  --interro-accent-soft: #eef7f1;
+
+  /* --- Gold (secondary / premium accent) ----------------------------- */
+  --interro-gold: #ffc72c;
+  --interro-gold-dark: #bb9220;
+  --interro-gold-soft: #fff6dc;
+
+  /* --- Neutrals ------------------------------------------------------ */
+  --ink: #18181b;
+  --gray-100: #f1f5f9;
+  --gray-200: #e2e8f0;
+  --gray-300: #cbd5e1;
+  --gray-400: #94a3b8;
+  --gray-500: #64748b;
+  --white: #ffffff;
+
+  /* --- Status -------------------------------------------------------- */
+  --success: #339966;
+  --warning: #f59e0b;
+  --error: #ef4444;
+
+  /* --- Type ---------------------------------------------------------- */
+  /* Green schemes use the clean sans (Aptos); the serif (Lora) is reserved
+     for editorial / positioning lines, per the deck's headline treatment. */
+  --font-sans: 'Aptos', 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif;
+  --font-serif: 'Lora', 'Georgia', 'Times New Roman', serif;
+  --font-mono: 'Cascadia Mono', 'Consolas', ui-monospace, monospace;
+
+  /* --- Elevation & shape --------------------------------------------- */
+  --radius: 10px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 2px rgba(18, 53, 36, 0.06);
+  --shadow: 0 4px 16px rgba(18, 53, 36, 0.08);
+  --shadow-lg: 0 12px 40px rgba(18, 53, 36, 0.14);
+}
+
+/* Brand voice, for reference in copy:
+   Positioning : "Purpose-Built Platform for High Dollar, Multi-Party Transactions"
+   Tagline     : "Know Every Party. Monitor Every Movement. Trust Every Transaction."
+   Endorsement : "an iAltA company"
+   Logo        : lowercase `interro` wordmark, deep green, with a full-width
+                 rule carrying a dot at each end sitting above the word.
+                 Knockout (white) variant: /brand/interro-logo-knockout.png
+*/
