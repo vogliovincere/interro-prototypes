@@ -66,7 +66,7 @@ const state = {
   layout: 'stacked',      // 'stacked' | 'side'      — dev tools
   amountStyle: 'band',    // 'band' | 'plain'          — dev tools
   dueStyle: 'row',        // 'row' | 'inline'          — dev tools
-  showLp: false,          // LP name as a subheader    — dev tools
+  showLp: true,           // LP name as a subheader    — dev tools
   memoStyle: 'required',  // 'required' | 'recommended' — dev tools
   additional: false,      // Additional Payment Information accordion — dev tools
   addlOpen: false,        // accordion expanded?
@@ -116,7 +116,7 @@ const modalRoot = document.getElementById('modal-root');
   if (q.get('layout') === 'side') state.layout = 'side';
   if (q.get('amount') === 'plain') state.amountStyle = 'plain';
   if (q.get('due') === 'inline') state.dueStyle = 'inline';
-  if (q.get('lp') === '1') state.showLp = true;
+  if (q.get('lp') === '0') state.showLp = false;   // on by default now
   if (q.get('memo') === 'recommended') state.memoStyle = 'recommended';
 })();
 
@@ -709,7 +709,7 @@ dev.addEventListener('click', (e) => {
     Object.assign(state, {
       screen: 'choose', route: null, pending: null,
       bankCountry: null, bankCountryErr: false,
-      layout: 'stacked', amountStyle: 'band', dueStyle: 'row', showLp: false,
+      layout: 'stacked', amountStyle: 'band', dueStyle: 'row', showLp: true,
       memoStyle: 'required', additional: false, addlOpen: false,
       localize: true, usLabels: true,
     });
