@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="interro-green">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interro · Receive a Distribution</title>
+  <link rel="stylesheet" href="../../brand/tokens.css" />
+  <link rel="stylesheet" href="../shared/picker.css" />
+  <link rel="stylesheet" href="../wire-details/app.css" />
+  <link rel="stylesheet" href="app.css" />
+</head>
+<body>
+
+<div class="stage">
+
+  <!-- ======================================================================
+       DEV TOOLS — demo scaffolding, lives OUTSIDE the mobile frame.
+       Never ships; exists so the flow and its variants can be driven live.
+       ==================================================================== -->
+  <aside class="dev">
+    <div class="dev__title">Dev tools</div>
+
+    <section class="dev__group">
+      <p class="dev__label">Flow</p>
+      <div class="dev__nav">
+        <button class="dev__navitem" data-goto="intro">1 · What this is</button>
+        <button class="dev__navitem" data-goto="country">2 · Bank country</button>
+        <button class="dev__navitem" data-goto="details">3 · Your wire details</button>
+        <button class="dev__navitem" data-goto="done">4 · Success</button>
+      </div>
+    </section>
+
+    <section class="dev__group">
+      <p class="dev__label">Recipient's bank country</p>
+      <select class="dev__select" id="dev-country"></select>
+      <p class="dev__hint" id="dev-schema-note"></p>
+    </section>
+
+    <section class="dev__group">
+      <p class="dev__label">Form behaviour</p>
+      <label class="dev__check">
+        <input type="checkbox" id="dev-uslabels" checked />
+        <span>Show U.S. equivalent under each field</span>
+      </label>
+      <label class="dev__check">
+        <input type="checkbox" id="dev-hints" checked />
+        <span>Show “where to find it” hints</span>
+      </label>
+      <label class="dev__check">
+        <input type="checkbox" id="dev-prefill" />
+        <span>Prefill with valid sample data</span>
+      </label>
+    </section>
+
+    <section class="dev__group">
+      <p class="dev__label">Success screen</p>
+      <div class="dev__seg dev__seg--col" data-seg="done">
+        <button data-done="checking">Verifying (animated)</button>
+        <button data-done="success">Complete</button>
+      </div>
+    </section>
+
+    <section class="dev__group dev__group--last">
+      <button class="dev__reset" id="dev-reset">Reset demo</button>
+    </section>
+  </aside>
+
+  <!-- ======================================================================
+       MOBILE FRAME — same 390px widget geometry as the capital-call flow.
+       ==================================================================== -->
+  <div class="phone">
+    <div class="phone__scroll" id="scroll">
+
+      <header class="wtop">
+        <img class="wtop__logo" src="../../brand/interro-logo.png" alt="interro" />
+        <span class="wtop__ctx">Distribution</span>
+      </header>
+
+      <div class="progress" id="progress" role="progressbar"
+           aria-valuemin="1" aria-valuemax="4" aria-label="Progress"></div>
+
+      <main id="app" class="screen"><!-- rendered by app.js --></main>
+
+      <footer class="powered">
+        <span>Powered by</span>
+        <img src="../../brand/interro-logo.png" alt="Interro" />
+      </footer>
+    </div>
+
+    <div class="modalroot" id="modal-root"></div>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </div>
+
+</div>
+
+<script src="../shared/countries.js"></script>
+<script src="../shared/wireReceive.js"></script>
+<script src="../shared/picker.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

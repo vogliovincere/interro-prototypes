@@ -1,0 +1,359 @@
+/* =============================================================================
+   Interro — Receive a Distribution (mobile widget prototype)
+
+   This sheet is a DELTA. It loads after ../wire-details/app.css and reuses that
+   file's frame, dev-panel, button, card, row, modal and toast layers wholesale —
+   the two widgets are the same product and must not drift apart visually.
+   Everything below is specific to collecting wire details rather than showing
+   them.
+   ========================================================================== */
+
+/* ==========================================================================
+   Screen 1 — priming
+   The investor arrived from an email and does not yet know what this is. Three
+   short beats: what, why it matters, how long.
+   ========================================================================== */
+.intro__lede {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--gray-500);
+  margin: 0 0 20px;
+}
+
+.steps {
+  list-style: none;
+  margin: 0 0 20px;
+  padding: 0;
+  counter-reset: step;
+}
+.steps li {
+  position: relative;
+  counter-increment: step;
+  padding: 0 0 16px 40px;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--ink);
+}
+/* Connector rail between the numbered markers — echoes the dotted rule in the
+   Interro wordmark. */
+.steps li::after {
+  content: '';
+  position: absolute;
+  left: 13px; top: 26px; bottom: 2px;
+  width: 1px;
+  background: var(--gray-200);
+}
+.steps li:last-child { padding-bottom: 0; }
+.steps li:last-child::after { display: none; }
+.steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0; top: 0;
+  width: 27px; height: 27px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--interro-green-soft);
+  color: var(--interro-green);
+  font-size: 12px;
+  font-weight: 700;
+}
+.steps strong {
+  display: block;
+  color: var(--interro-green);
+  font-weight: 650;
+  margin-bottom: 2px;
+}
+
+/* Distribution summary — mirrors .callcard geometry so the two flows read as
+   siblings, but reversed: this is money arriving, not money owed. */
+.distcard { padding: 0; margin-bottom: 20px; overflow: hidden; }
+.distcard__head { padding: 14px 16px 13px; }
+.distcard__fund {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--interro-green);
+  margin: 0;
+  line-height: 1.3;
+}
+.distcard__meta {
+  margin: 3px 0 0;
+  font-size: 12.5px;
+  color: var(--gray-500);
+}
+.distcard__amt {
+  background: var(--interro-green);
+  color: #fff;
+  padding: 14px 16px 15px;
+}
+.distcard__amt .label {
+  display: block;
+  font-size: 12.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.62);
+  margin-bottom: 9px;
+}
+.distcard__amt .value {
+  display: block;
+  font-size: 29px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+/* ==========================================================================
+   Screen 3 — the country-conditional form
+   ========================================================================== */
+
+/* Confirms which country's rules are being applied, and offers a way back —
+   picking the wrong country is the one mistake that invalidates the whole form,
+   so changing it must never be more than one tap away. */
+.formctx {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 13px;
+  margin-bottom: 18px;
+  border-radius: var(--radius-lg);
+  background: var(--interro-green-soft);
+  border: 1px solid #cfe7db;
+}
+.formctx__txt {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #2b5c45;
+  min-width: 0;
+}
+.formctx__txt strong { color: var(--interro-green); }
+.formctx__change {
+  margin-left: auto;
+  flex-shrink: 0;
+  background: transparent;
+  border: 1px solid #a8cfbc;
+  border-radius: 7px;
+  color: var(--interro-green);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 650;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+.formctx__change:hover { background: #fff; border-color: var(--interro-green); }
+
+/* Country-specific warning worth reading before typing, not after failing. */
+.gotcha {
+  display: flex;
+  gap: 9px;
+  padding: 12px 14px;
+  margin-bottom: 18px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, var(--interro-gold-soft), #fffdf6);
+  border: 1px solid #f0dfae;
+  border-left: 3px solid var(--interro-gold);
+}
+.gotcha svg {
+  width: 16px; height: 16px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--interro-gold-dark);
+}
+.gotcha p {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: #7a6420;
+}
+
+/* The U.S.-equivalent gloss under a field label. Same role as .row__us on the
+   capital-call side, but here it sits under an input rather than a value. */
+.flabel__us {
+  display: block;
+  margin-top: 2px;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--gray-400);
+}
+
+/* Requirement chips. "Required" is the default and stays unlabelled — labelling
+   the norm would make the exceptions harder to spot, not easier. */
+.reqchip {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  vertical-align: 1px;
+}
+.reqchip--conditional { background: var(--interro-gold-soft); color: var(--interro-gold-dark); }
+.reqchip--optional { background: var(--gray-100); color: var(--gray-500); }
+
+/* A valid entry gets a quiet green tick. Deliberately understated — this is
+   format validation, not confirmation that the account exists. */
+.fgroup { position: relative; }
+.finput.is-ok { border-color: #a8cfbc; }
+.fok {
+  position: absolute;
+  right: 12px;
+  bottom: 14px;
+  width: 16px; height: 16px;
+  color: var(--success);
+  pointer-events: none;
+}
+.fgroup:has(.fhelp) .fok,
+.fgroup:has(.ferror) .fok { bottom: auto; top: 41px; }
+
+select.finput {
+  appearance: none;
+  background-image: none;
+  cursor: pointer;
+}
+
+/* Error summary above the submit button, so a failed submit on a long form does
+   not require hunting. Each entry scrolls to its field. */
+.errsum {
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  border-radius: var(--radius-lg);
+  background: #fdeaea;
+  border: 1px solid #f5c9c9;
+  border-left: 3px solid var(--error);
+}
+.errsum__title {
+  margin: 0 0 7px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #a52020;
+}
+.errsum ul { margin: 0; padding-left: 16px; }
+.errsum li { font-size: 11.5px; line-height: 1.5; color: #a52020; }
+.errsum button {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-size: 11.5px;
+  color: #a52020;
+  text-decoration: underline;
+  cursor: pointer;
+  text-align: left;
+}
+
+/* ==========================================================================
+   Screen 4 — success
+   Ported from the Embedded KYC UI's terminal screen (.terminal-* classes in
+   Embeddable-UI/app-embedded/src/styles/global.css) so a user who has completed
+   KYC recognises the ending.
+   ========================================================================== */
+.terminal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 30px 8px 20px;
+  min-height: 380px;
+}
+
+.terminal__icon {
+  width: 92px; height: 92px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--success);
+  color: #fff;
+  margin-bottom: 22px;
+  animation: pop-in .34s cubic-bezier(.2, .9, .3, 1.2);
+}
+.terminal__icon svg { width: 44px; height: 44px; }
+@keyframes pop-in {
+  from { transform: scale(.5); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.terminal__heading {
+  font-size: 23px;
+  font-weight: 700;
+  color: var(--interro-green);
+  margin: 0 0 10px;
+  letter-spacing: -0.015em;
+}
+.terminal__sub {
+  font-size: 13.5px;
+  color: var(--gray-500);
+  line-height: 1.55;
+  max-width: 290px;
+  margin: 0 0 22px;
+}
+
+/* Verifying phase — the same sequential checklist pattern as the KYC flow's
+   IndStatus screen, which sets the expectation that something real is happening. */
+.checklist {
+  width: 100%;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  text-align: left;
+}
+.checkitem {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 13px 15px;
+  font-size: 13px;
+  color: var(--ink);
+  border-bottom: 1px solid var(--gray-100);
+}
+.checkitem:last-child { border-bottom: 0; }
+.checkitem__tick {
+  width: 19px; height: 19px;
+  min-width: 19px;
+  border-radius: 50%;
+  background: var(--success);
+  color: #fff;
+  display: grid;
+  place-items: center;
+}
+.checkitem__tick svg { width: 11px; height: 11px; }
+.spinner {
+  width: 17px; height: 17px;
+  min-width: 17px;
+  border: 2px solid var(--gray-200);
+  border-top-color: var(--interro-accent);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.checkitem.is-pending { color: var(--gray-400); }
+
+/* Read-back of what was submitted. The recipient just typed an IBAN from
+   memory — showing it back is the cheapest possible error check. */
+.summary {
+  width: 100%;
+  text-align: left;
+  margin-bottom: 18px;
+}
+.summary__head {
+  padding: 11px 15px;
+  background: #fbfdfc;
+  border-bottom: 1px solid var(--gray-200);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--interro-green);
+}
+.summary .row { padding: 10px 15px; }
+.summary .row__value { font-size: 13px; }
+
+.dev__hint {
+  font-size: 10.5px;
+  line-height: 1.4;
+  color: #6f6f92;
+  margin: 0;
+}

@@ -58,16 +58,35 @@
     <p class="tag">Purpose-Built Platform for High Dollar, Multi-Party Transactions</p>
 
     <a class="proto" href="prototypes/wire-details/index.html">
-      <h2>Capital Call Wire Instructions →</h2>
+      <h2>Paying a Capital Call →</h2>
       <p>
-        Investor-facing flow showing how Interro adapts wire details to the payment
-        route — SWIFT/BIC included for international wires, omitted for domestic,
-        with a required wire memo code in both cases.
+        Investor-facing flow for sending money <em>to</em> Interro's U.S. account.
+        Adapts wire details to the payment route, then — for international wires —
+        asks which country the payer's own bank is in and relabels every field in
+        that bank's own vocabulary, surfacing local requirements like Japan's
+        balance-of-payments code or Brazil's contrato de câmbio.
       </p>
-      <span class="meta">Marketing demo · 2 screens</span>
+      <span class="meta">3 screens · 40 jurisdictions</span>
     </a>
 
-    <footer>Prototypes contain fabricated demo data — not live payment instructions.</footer>
+    <a class="proto" href="prototypes/distributions/index.html">
+      <h2>Receiving a Distribution →</h2>
+      <p>
+        The mirror image: collecting a recipient's bank details so Interro can wire
+        money <em>out</em>. The field set itself changes by country — IBAN for
+        Germany, ABA and account type for the U.S., BSB for Australia, IFSC for
+        India, CLABE for Mexico, CPF/CNPJ for Brazil — with format validation on
+        each.
+      </p>
+      <span class="meta">4 screens · 40 jurisdictions</span>
+    </a>
+
+    <footer>
+      Prototypes contain fabricated demo data — not live payment instructions.
+      Field requirements are drawn from
+      <em>International Wire Address Formats v2</em>; see that report for sourcing
+      and for the requirements flagged as unverified.
+    </footer>
   </div>
 </body>
 </html>

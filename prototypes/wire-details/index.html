@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Interro · Capital Call Wire Instructions</title>
   <link rel="stylesheet" href="../../brand/tokens.css" />
+  <link rel="stylesheet" href="../shared/picker.css" />
   <link rel="stylesheet" href="app.css" />
 </head>
 <body>
@@ -22,8 +23,28 @@
       <p class="dev__label">Flow</p>
       <div class="dev__nav">
         <button class="dev__navitem" data-goto="choose">1 · Payment options</button>
-        <button class="dev__navitem" data-goto="domestic">2 · Domestic wire details</button>
-        <button class="dev__navitem" data-goto="international">2 · International wire details</button>
+        <button class="dev__navitem" data-goto="origin">2 · Where is your bank?</button>
+        <button class="dev__navitem" data-goto="domestic">Domestic wire details</button>
+        <button class="dev__navitem" data-goto="international">International wire details</button>
+      </div>
+    </section>
+
+    <!-- The feature this prototype exists to evaluate: asking the payer which
+         country their own bank sits in, then relabelling the wire instructions
+         in that bank's own field names. Off = the old single generic screen. -->
+    <section class="dev__group">
+      <p class="dev__label">Localized international instructions</p>
+      <label class="dev__check">
+        <input type="checkbox" id="dev-origin" checked />
+        <span>Ask “Where is your bank located?” &amp; localize field names</span>
+      </label>
+      <div class="dev__sub" id="dev-origin-sub">
+        <p class="dev__label">Sending bank country</p>
+        <select class="dev__select" id="dev-country"></select>
+        <label class="dev__check">
+          <input type="checkbox" id="dev-uslabels" checked />
+          <span>Show U.S. equivalent as a subheader</span>
+        </label>
       </div>
     </section>
 
@@ -111,6 +132,9 @@
 
 </div>
 
+<script src="../shared/countries.js"></script>
+<script src="../shared/wireFields.js"></script>
+<script src="../shared/picker.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
