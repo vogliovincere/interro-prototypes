@@ -1,7 +1,7 @@
 /* =============================================================================
    Interro — Receive a Distribution (mobile widget prototype)
 
-   This sheet is a DELTA. It loads after ../wire-details/app.css and reuses that
+   This sheet is a DELTA. It loads after ../capital-call-wire-details/app.css and reuses that
    file's frame, dev-panel, button, card, row, modal and toast layers wholesale —
    the two widgets are the same product and must not drift apart visually.
    Everything below is specific to collecting wire details rather than showing
