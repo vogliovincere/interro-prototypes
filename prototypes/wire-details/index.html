@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="robots" content="noindex" />
+  <title>Moved → Capital Call Wire Details</title>
+
+  <!--
+    REDIRECT STUB. This prototype moved to ../capital-call-wire-details/ so the
+    folder name says which flow it is. Links to the old path were already in
+    circulation, so rather than leave them 404ing this forwards them on.
+
+    GitHub Pages serves static files only — no server-side redirects — so it has
+    to happen in the page. The script preserves the query string (?dev=1,
+    ?route=international&bank=DE and so on) and uses location.replace so the old
+    URL does not sit in the back-button history. The meta refresh is the fallback
+    if scripting is off; it cannot carry the query string, hence both.
+
+    Safe to delete once the old link is no longer anywhere anyone can click it.
+  -->
+  <script>
+    location.replace('../capital-call-wire-details/' + location.search + location.hash);
+  </script>
+  <noscript>
+    <meta http-equiv="refresh" content="0; url=../capital-call-wire-details/" />
+  </noscript>
+
+  <style>
+    body {
+      margin: 0; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      font: 15px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: #2b3a33; background: #eef2f6; padding: 24px; text-align: center;
+    }
+    a { color: #339966; }
+  </style>
+</head>
+<body>
+  <p>
+    This prototype moved.<br />
+    <a href="../capital-call-wire-details/">Continue to Capital Call Wire Details →</a>
+  </p>
+</body>
+</html>
