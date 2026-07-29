@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Interro · UI/UX Prototypes (internal)</title>
+  <link rel="stylesheet" href="brand/tokens.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh;
+      font-family: var(--font-sans); color: var(--ink);
+      background: var(--interro-green);
+      display: flex; align-items: center; justify-content: center;
+      padding: 40px 24px;
+    }
+    .wrap { width: 100%; max-width: 680px; }
+    /* Same accent-green badge as the shared gallery — the knockout asset is
+       plated on #339966, so a bare placement would show a visible plate edge. */
+    .logobadge {
+      display: inline-block;
+      background: var(--interro-accent);
+      padding: 16px 22px;
+      border-radius: var(--radius);
+      margin-bottom: 30px;
+      line-height: 0;
+    }
+    .logobadge img { height: 30px; width: auto; display: block; }
+    h1 { color: #fff; font-size: 30px; margin: 0 0 8px; font-weight: 650; letter-spacing: -0.015em; }
+    .tag {
+      font-family: var(--font-serif); color: var(--interro-accent);
+      font-size: 16px; margin: 0 0 22px; line-height: 1.5;
+    }
+    /* Loud enough that nobody mistakes this page for the one they can forward. */
+    .banner {
+      background: #4a3a00; border-left: 4px solid #d9a300;
+      color: #ffe8a8; border-radius: var(--radius);
+      padding: 14px 16px; margin: 0 0 26px;
+      font-size: 13px; line-height: 1.55;
+    }
+    .banner strong { color: #ffd469; }
+    .banner code {
+      font-family: var(--font-mono, ui-monospace, monospace);
+      font-size: 12px; background: rgba(0,0,0,.3);
+      padding: 1px 5px; border-radius: 4px;
+    }
+    a.proto {
+      display: block; text-decoration: none;
+      background: #fff; border-radius: var(--radius-lg);
+      padding: 22px 24px; margin-bottom: 14px;
+      border-left: 4px solid #d9a300;
+      transition: transform .15s, box-shadow .15s;
+    }
+    a.proto:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+    .proto h2 { margin: 0 0 6px; font-size: 17px; color: var(--interro-green); font-weight: 700; }
+    .proto p { margin: 0; font-size: 13.5px; color: var(--gray-500); line-height: 1.5; }
+    .proto .meta {
+      display: inline-block; margin-top: 12px; font-size: 11px; font-weight: 800;
+      letter-spacing: 0.07em; text-transform: uppercase;
+      color: #8a6d00; background: #fdf3d3;
+      padding: 4px 9px; border-radius: 100px;
+    }
+    footer { color: rgba(255,255,255,.5); font-size: 12.5px; margin-top: 28px; line-height: 1.6; }
+    footer a { color: var(--interro-accent); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <span class="logobadge"><img src="brand/interro-logo-knockout.png" alt="interro" /></span>
+    <h1>UI / UX Prototypes — Internal</h1>
+    <p class="tag">Dev tools on. For driving the demo, not for forwarding.</p>
+
+    <div class="banner">
+      <strong>Don't share this page.</strong> Every link below carries
+      <code>?dev=1</code>, which reveals the dark dev-tools console beside the
+      widget — screen jumper, country selector and feature toggles. The page to
+      forward is <a href="index.html" style="color:#ffd469">the shared gallery</a>,
+      where the same prototypes render as the widget alone with every toggle at
+      its default.
+    </div>
+
+    <a class="proto" href="prototypes/capital-call-wire-details/index.html?dev=1">
+      <h2>Paying a Capital Call →</h2>
+      <p>
+        Investor-facing flow for sending money <em>to</em> Interro's U.S. account.
+        Dev tools drive the four screen states, switch the sending bank's country
+        across 40 jurisdictions, and toggle localization and the U.S.-equivalent
+        subheaders independently.
+      </p>
+      <span class="meta">3 screens · 40 jurisdictions · dev tools</span>
+    </a>
+
+    <a class="proto" href="prototypes/distributions/index.html?dev=1">
+      <h2>Receiving a Distribution →</h2>
+      <p>
+        Collecting a recipient's bank details so Interro can wire money
+        <em>out</em>. Dev tools switch the recipient country to watch the field
+        set itself change, prefill valid sample data for each schema, and hold
+        the success screen in either its verifying or completed phase.
+      </p>
+      <span class="meta">4 screens · 40 jurisdictions · dev tools</span>
+    </a>
+
+    <footer>
+      Prototypes contain fabricated demo data — not live payment instructions.
+      Field requirements are drawn from
+      <em>International Wire Address Formats v2</em>; see that report for sourcing
+      and for the requirements flagged as unverified.
+    </footer>
+  </div>
+</body>
+</html>

@@ -120,6 +120,13 @@ const modalRoot = document.getElementById('modal-root');
   if (q.get('memo') === 'recommended') state.memoStyle = 'recommended';
 })();
 
+/* The dev panel is opt-in: ?dev=1 reveals it, anything else gets the widget on
+   its own with every toggle at its default. Hidden is the CSS default, so the
+   clean link can never flash the panel before this runs. */
+if (new URLSearchParams(location.search).get('dev') === '1') {
+  document.documentElement.classList.add('devmode');
+}
+
 /* ------------------------------------------------------- instruction model */
 
 /**

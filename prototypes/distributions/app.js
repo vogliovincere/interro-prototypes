@@ -81,6 +81,13 @@ const modalRoot = document.getElementById('modal-root');
   if (q.get('hints') === '0') state.hints = false;
 })();
 
+/* The dev panel is opt-in: ?dev=1 reveals it, anything else gets the widget on
+   its own with every toggle at its default. Hidden is the CSS default, so the
+   clean link can never flash the panel before this runs. */
+if (new URLSearchParams(location.search).get('dev') === '1') {
+  document.documentElement.classList.add('devmode');
+}
+
 const schema = () => (state.country ? window.receiveSchema(state.country.code) : null);
 
 /* Inline SVG icons — flag emoji and dingbats are unreliable on Windows Chrome. */

@@ -28,9 +28,13 @@ jobs:
       - name: Assemble site
         # Only the files the browser needs — keeps repo notes, brand-guideline
         # source decks and .claude config out of the published site.
+        #
+        # Two entry points: index.html is the widget on its own (the link that
+        # gets forwarded) and internal.html points at the same prototypes with
+        # ?dev=1 so the dev-tools console shows.
         run: |
           mkdir -p _site
-          cp index.html _site/
+          cp index.html internal.html _site/
           cp -r brand _site/
           cp -r prototypes _site/
 

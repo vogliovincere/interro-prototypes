@@ -29,7 +29,16 @@ body {
 /* ==========================================================================
    DEV TOOLS
    Deliberately un-branded (dark console look) so it never reads as Interro UI.
+
+   Gated behind ?dev=1. Without it the panel is hidden and the widget sits
+   alone, centered — that is the link for people evaluating the product rather
+   than driving the demo. Hidden via CSS rather than removed from the DOM so
+   app.js can keep querying the panel unconditionally; deleting it would mean
+   null-guarding roughly twenty call sites for no visible gain.
    ========================================================================== */
+.dev { display: none; }
+.devmode .dev { display: block; }
+
 .dev {
   width: 236px;
   min-width: 236px;
