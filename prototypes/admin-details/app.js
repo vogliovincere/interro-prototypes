@@ -123,7 +123,12 @@ const modalRoot = document.getElementById('modal-root');
   const cc = (q.get('country') || '').toUpperCase();
   if (cc) {
     const c = window.countryByCode(cc);
-    if (c) state.draft.country = c;
+    if (c) {
+      state.draft.country = c;
+      // Follow the schema's currency too, or a ?country=DE deep link opens a
+      // German account defaulting to USD, which reads as a bug in a demo.
+      state.draft.currency = window.adfAccountFields(c.code).currency || state.draft.currency;
+    }
   }
 
   const st = q.get('structure');
@@ -479,7 +484,7 @@ function substepDetails() {
         ${state.hints ? `
           <p class="fhelp">
             Asked per account, not per party — the fields below change with it.
-            A ${d.country.name} account needs
+            An account in ${d.country.name} needs
             ${s.usesIban ? 'an IBAN' : 'a national routing code, not an IBAN'}.
           </p>` : ''}
       </div>
