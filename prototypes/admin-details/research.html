@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interro · Settlement Instructions — Research &amp; Design Decisions</title>
+  <link rel="stylesheet" href="../../brand/tokens.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font-sans);
+      color: var(--ink);
+      background: var(--gray-100);
+      line-height: 1.65;
+      font-size: 15.5px;
+    }
+    .page { max-width: 820px; margin: 0 auto; padding: 0 24px 80px; }
+
+    header.top {
+      background: var(--interro-green);
+      margin-bottom: 36px;
+      padding: 34px 0 30px;
+    }
+    header.top .page { padding-bottom: 0; }
+    .logobadge {
+      display: inline-block; background: var(--interro-accent);
+      padding: 12px 18px; border-radius: var(--radius);
+      margin-bottom: 22px; line-height: 0;
+    }
+    .logobadge img { height: 24px; width: auto; display: block; }
+    header.top h1 {
+      color: #fff; font-size: 27px; margin: 0 0 8px;
+      font-weight: 650; letter-spacing: -0.015em; line-height: 1.25;
+    }
+    header.top p {
+      margin: 0; color: rgba(255,255,255,.72); font-size: 14.5px; max-width: 60ch;
+    }
+    header.top .backlink {
+      display: inline-block; margin-top: 20px;
+      color: var(--interro-accent); font-size: 13px; font-weight: 700;
+      text-decoration: none;
+    }
+    header.top .backlink:hover { text-decoration: underline; }
+
+    h2 {
+      font-size: 20px; font-weight: 700; color: var(--interro-green);
+      margin: 44px 0 4px; letter-spacing: -0.01em;
+      padding-top: 18px; border-top: 2px solid var(--gray-300);
+    }
+    h2 .num {
+      display: block; font-size: 11px; font-weight: 800; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--interro-accent); margin-bottom: 5px;
+    }
+    h3 { font-size: 15.5px; font-weight: 700; color: var(--interro-green); margin: 26px 0 6px; }
+    p { margin: 0 0 14px; }
+    ul, ol { margin: 0 0 14px; padding-left: 22px; }
+    li { margin-bottom: 7px; }
+    strong { font-weight: 700; color: var(--interro-green); }
+    em { font-style: italic; }
+    code {
+      font-family: var(--font-mono); font-size: 0.88em;
+      background: var(--gray-200); padding: 1px 5px; border-radius: 4px;
+    }
+    a { color: #1c6b45; }
+
+    .lede { font-size: 17px; color: var(--gray-500); margin-bottom: 8px; }
+
+    .card {
+      background: #fff; border-radius: var(--radius-lg);
+      padding: 20px 22px; margin: 18px 0;
+      box-shadow: var(--shadow-sm); border: 1px solid var(--gray-200);
+    }
+    .card > :last-child { margin-bottom: 0; }
+    .card h3 { margin-top: 0; }
+
+    .callout {
+      border-left: 4px solid var(--interro-accent);
+      background: var(--interro-accent-soft);
+      padding: 16px 20px; margin: 18px 0; border-radius: 0 var(--radius) var(--radius) 0;
+    }
+    .callout > :last-child { margin-bottom: 0; }
+    .callout--warn { border-left-color: var(--interro-gold-dark); background: var(--interro-gold-soft); }
+    .callout--warn strong { color: #7a5f10; }
+    .callout__k {
+      display: block; font-size: 10.5px; font-weight: 800; letter-spacing: 0.09em;
+      text-transform: uppercase; color: var(--interro-accent); margin-bottom: 5px;
+    }
+    .callout--warn .callout__k { color: var(--interro-gold-dark); }
+
+    .tablewrap { overflow-x: auto; margin: 18px 0; }
+    table { border-collapse: collapse; width: 100%; font-size: 14px; background: #fff; }
+    th, td { text-align: left; padding: 10px 13px; border-bottom: 1px solid var(--gray-200); vertical-align: top; }
+    th {
+      background: var(--interro-green); color: #fff; font-size: 11.5px;
+      font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;
+      border-bottom: 0; white-space: nowrap;
+    }
+    tbody tr:last-child td { border-bottom: 0; }
+    td code { font-size: 0.85em; }
+
+    pre {
+      background: var(--interro-green); color: #d7e6dd;
+      padding: 15px 18px; border-radius: var(--radius);
+      overflow-x: auto; font-family: var(--font-mono);
+      font-size: 12.5px; line-height: 1.7; margin: 14px 0;
+    }
+    blockquote {
+      margin: 14px 0; padding: 2px 0 2px 18px;
+      border-left: 3px solid var(--gray-300);
+      color: var(--gray-500); font-style: italic;
+    }
+    blockquote p:last-child { margin-bottom: 0; }
+
+    .pill {
+      display: inline-block; font-size: 10.5px; font-weight: 800;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      padding: 2px 8px; border-radius: 100px; white-space: nowrap;
+    }
+    .pill--ok   { background: var(--interro-green); color: #fff; }
+    .pill--inf  { background: var(--interro-gold-soft); color: var(--interro-gold-dark); }
+    .pill--no   { background: #fdecec; color: #a52020; }
+
+    footer.foot {
+      margin-top: 46px; padding-top: 20px; border-top: 2px solid var(--gray-300);
+      font-size: 13px; color: var(--gray-500);
+    }
+    @media print {
+      body { background: #fff; }
+      .card, table { box-shadow: none; }
+      h2 { page-break-after: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="top">
+  <div class="page">
+    <span class="logobadge"><img src="../../brand/interro-logo-knockout.png" alt="interro" /></span>
+    <h1>Settlement Instructions Onboarding<br />Research &amp; Design Decisions</h1>
+    <p>
+      What four real private-credit administrative details forms actually contain,
+      what the market convention turned out to be, and why the prototype is shaped
+      the way it is — including the places where we chose to go beyond the
+      evidence, and said so.
+    </p>
+    <a class="backlink" href="index.html">← Open the prototype</a>
+  </div>
+</header>
+
+<div class="page">
+
+  <p class="lede">
+    Adam Herring raised Admin Details forms as the point in a private-credit
+    relationship where wire details are collected. This is the research behind a
+    third prototype built for that moment.
+  </p>
+
+  <p>
+    The existing two widgets are both anchored to a payment: the capital-call flow
+    displays instructions for money coming <em>in</em>, the distribution flow
+    collects one account for a distribution already declared. Private credit
+    onboarding is not anchored to a payment at all. A lender publishes its
+    settlement details <strong>once, as a standing record</strong>, before any
+    particular payment exists — and that record routinely holds several accounts.
+    Nothing in either existing widget can represent that, which is why this is a
+    third prototype rather than a variant of the second.
+  </p>
+
+  <!-- ================================================================== -->
+  <h2><span class="num">Section 1</span>What was reviewed</h2>
+
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr><th>Document</th><th>What it is</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>LSTA/LMA Standard Administrative Details Form</strong><br />
+            effective 31 May 2018</td>
+          <td>The current industry-standard template. Jointly issued by the LMA and
+            LSTA; completed by the lender and delivered to agents and counterparties.
+            SWIFT-party-modelled (fields cite 54a / 56a / 57a / 59a).</td>
+          <td>Read in full</td>
+        </tr>
+        <tr>
+          <td><strong>LSTA Administrative Questionnaire</strong><br />January 2005</td>
+          <td>The predecessor, still in wide use. Issued <em>by the agent</em> —
+            it carries an agent logo and a "Return form to:" block — and captures
+            the agent's own wire instructions alongside the lender's.</td>
+          <td>Read in full</td>
+        </tr>
+        <tr>
+          <td><strong>A completed CLO admin-details form</strong></td>
+          <td>The most valuable of the four: not a blank template but a real
+            filled-in instance, showing what a CLO actually publishes. Supplied
+            privately; held outside this repo.</td>
+          <td>Read in full</td>
+        </tr>
+        <tr>
+          <td><strong>S&amp;P Global "ADFlow Secure Settlement Instructions"</strong></td>
+          <td>A two-page marketing brochure, <em>not</em> a form — zero fillable
+            fields. Valuable anyway for the process vocabulary it defines around
+            the ADF, and for what it says about callbacks.</td>
+          <td>Body text read; four embedded UI screenshots are raster images and
+            were not legible</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>
+    The 2018 and 2023 editions of the ADF were also cross-checked against copies
+    filed as credit-agreement exhibits on SEC EDGAR, which is how the repeatability
+    rules below were confirmed. The current edition (28 January 2025) sits behind
+    LSTA member login and was <strong>not</strong> verified.
+  </p>
+
+  <!-- ================================================================== -->
+  <h2><span class="num">Section 2</span>The five findings that shaped the design</h2>
+
+  <h3>2.1 &nbsp;“FFA” is not the term. The pair is DDA → FFC, and it is a hierarchy.</h3>
+
+  <p>
+    The brief for this prototype named two account-type tags, DDA and FFA. DDA is
+    real and ubiquitous. <strong>FFA appears in none of the four documents.</strong>
+    What the market actually writes is <code>FFC</code> — "for further credit" — and
+    the two are not siblings. They are two levels of the same address:
+  </p>
+
+<pre>Name of Bank          &lt;trustee&gt; Agency &amp; Trust - New York
+ABA Number            &lt;routing number&gt;         ← level 1 is what this reaches
+DDA Account Number    &lt;trustee's account&gt;      ← LEVEL 1  (Demand Deposit Account)
+DDA Account Name      &lt;the CLO's name&gt;
+FFC Account Name      &lt;the CLO's name&gt; / Collection Account
+FFC Account Number    &lt;sub-account&gt;            ← LEVEL 2  (for further credit)</pre>
+
+  <div class="callout">
+    <span class="callout__k">Why this matters more than it looks</span>
+    <p>
+      Get level 1 right and level 2 wrong and the wire <strong>arrives</strong> —
+      and is never credited to the party. It sits unapplied in the custodian's
+      account. That is materially worse than a rejection, because a rejection
+      produces an error somebody chases and this produces silence.
+    </p>
+  </div>
+
+  <p>
+    The two older forms (the 2005 Questionnaire and the completed CLO form) both
+    carry an explicit <code>FFC Account Name</code> / <code>FFC Account No.</code>
+    pair. The 2018 ADF <strong>has no equivalent field at all</strong> — it expects
+    the sub-account either to <em>be</em> the beneficiary account (its Template 1,
+    "lender has dedicated account") or to be resolved from the reference line. That
+    is the single largest modelling divergence between the four documents and a
+    real data-loss risk for anyone mapping the old forms onto the new one.
+  </p>
+
+  <h3>2.2 &nbsp;The purpose tag already exists — as free text buried in a name.</h3>
+
+  <p>
+    No form has a purpose or account-type field. The completed CLO form encodes it
+    in the account <em>name</em>:
+  </p>
+
+  <blockquote>
+    <p>FFC Account Name: &nbsp;<code>&lt;entity&gt; / Collection Account</code></p>
+    <p>Account Name: &nbsp;<code>&lt;entity&gt; / Custody Account</code></p>
+  </blockquote>
+
+  <p>
+    Two sub-accounts, at the same custodian, inside the same DDA, distinguished by
+    a phrase a human typed into a name field. That value is unqueryable,
+    unvalidatable, and invisible to any system downstream. Promoting it to a
+    first-class tag is the clearest single thing this widget adds, and it costs the
+    user one tap.
+  </p>
+
+  <h3>2.3 &nbsp;Currency is the axis of multiplicity. Payment purpose is not.</h3>
+
+  <p>
+    This was the finding most likely to have been got wrong by intuition, so it was
+    checked hardest. Splitting accounts by principal / interest / fees feels
+    natural and is <strong>not the convention</strong>.
+  </p>
+
+  <p>Currency, in contrast, is unambiguously the key. The ADF's Appendix A says so:</p>
+
+  <blockquote><p>
+    "Lender may copy and paste the template below as many times as necessary to
+    capture various currency remittance instructions."
+  </p></blockquote>
+
+  <p>
+    <code>Currency</code> is the first field of every instruction block; ADFlow's
+    pitch is to "self manage <strong>all currency SSIs</strong>"; ISDA's Standing
+    Settlement Instructions SOP makes currency a <em>mandatory</em> component of an
+    SSI; SWIFT's MT 670/671 SSI-update messages carry a mandatory, repeating
+    sequence keyed on currency. Agents publish their own remittance instructions
+    the same way — separate USD and CAD blocks, one reference each.
+  </p>
+
+  <p>Purpose, meanwhile, appears in exactly one place across every edition of the ADF:</p>
+
+<pre>Payment Reference     Use Standard Wire Reference Format*:
+(Remittance Info)     [Borrower Name]
+                      [Facility Name/Abbr.] [Facility/Deal CUSIP/ISIN]
+                      [Payment Purpose(s)] [Transaction Reference ID]</pre>
+
+  <p>
+    Inside the <em>reference line</em>, beside four other unambiguously narrative
+    tokens. There is no purpose field at the top of the block and no
+    repeat-per-purpose instruction anywhere — in pointed contrast to the explicit
+    repeat-per-currency instruction. The completed CLO form makes the same choice
+    by hand: one account receives both, and its reference reads
+    <code>Loan Name &amp; [Principal or Interest]</code> — a bracketed either/or
+    still sitting unresolved in the template.
+  </p>
+
+  <p>
+    A search of SEC EDGAR full text for lender instructions splitting principal
+    from interest returned nothing usable. The closest hits actively disprove it:
+    one purchaser schedule is labelled "Wire Instructions for Principal/Interest/"
+    followed by a <em>single</em> account — the label enumerates purposes precisely
+    because one account takes all of them.
+  </p>
+
+  <div class="callout callout--warn">
+    <span class="callout__k">Where per-purpose accounts genuinely are real</span>
+    <p>
+      Adjacent markets, and worth not confusing with this one. Mortgage servicing
+      requires escrow (T&amp;I) funds segregated from P&amp;I funds. CLO indentures
+      maintain distinct Interest Collection and Principal Collection accounts at
+      the trustee. Both are <strong>payer-side</strong> legal-segregation or
+      waterfall constructs. On the <strong>payee</strong> side in syndicated
+      lending, a lender receives everything into one account per currency and
+      reconciles from reference data.
+    </p>
+  </div>
+
+  <h3>2.4 &nbsp;The market is deliberately removing phone callbacks.</h3>
+
+  <p>
+    This determines how the flow can end. S&amp;P Global's ADFlow brochure is
+    explicit — institutions have
+  </p>
+
+  <blockquote><p>
+    "been able to move away from laborious and outdated call-back requirements for
+    SSIs and reduce the risk of misdirected payments"
+  </p></blockquote>
+
+  <p>
+    with <em>"Remove Call-Backs"</em> named as a headline benefit. What replaces it
+    is a <strong>maker/checker</strong> approval — "a Maker/Checker process is a
+    requirement for data review and publication" — plus version history, a diff
+    tool, and permissioned distribution. The 2018 ADF's only nod to verification is
+    a contact tagged <code>SSI Verification</code>; the 2005 Questionnaire has no
+    verification concept whatsoever, which is the gap the newer machinery was built
+    to close.
+  </p>
+
+  <h3>2.5 &nbsp;Three of the four documents are mostly not about wires.</h3>
+
+  <p>
+    The 2018 ADF surrounds its one wire block with MEI, LEI, GIIN, CRN, EIN,
+    country of incorporation, country of tax residence, UK treaty passport number
+    and expiry, a signature-block drafting field, and five separate categories of
+    contact. The 2005 Questionnaire devotes its entire final page to a W-8BEN /
+    W-8ECI / W-8EXP / W-8IMY / W-9 decision tree, including the instruction that
+    faxed forms are not acceptable and an original must be submitted.
+  </p>
+
+  <p>
+    None of that affects where a wire goes. A settlement widget should
+    <em>consume</em> a resolved entity, not re-collect its identifiers — which is
+    the reasoning behind the scope decisions in the next section.
+  </p>
+
+  <!-- ================================================================== -->
+  <h2><span class="num">Section 3</span>Design decisions</h2>
+
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr><th>Decision</th><th>Why</th><th>Basis</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>A separate prototype, not a variant of the distribution flow</strong></td>
+          <td>Onboarding is not initiated by a payment and produces a list of
+            accounts, not one. The distribution widget's entire shape — one
+            country, one field set, one submit — is wrong for it.</td>
+          <td><span class="pill pill--ok">Evidenced</span></td>
+        </tr>
+        <tr>
+          <td><strong>Two-level accounts, asked as a plain-language question</strong></td>
+          <td>The ADF ships two templates and tells the reader which to use:
+            Template 1 "where … lender has dedicated account", Appendix A "where
+            recipient is intermediary bank with nostro account for custodian and
+            the Lender does not have a dedicated account". That is a real either/or
+            with different field sets. Printing both and hoping the reader picks
+            correctly is how it goes wrong, so the widget asks instead.</td>
+          <td><span class="pill pill--ok">Evidenced</span></td>
+        </tr>
+        <tr>
+          <td><strong>A first-class purpose tag on every account</strong></td>
+          <td>Replaces a convention currently carried as free text inside an
+            account name. Colour-coded on the card, because the point of promoting
+            it is that it becomes scannable.</td>
+          <td><span class="pill pill--ok">Evidenced</span></td>
+        </tr>
+        <tr>
+          <td><strong>Bank country asked <em>per account</em>, not per party</strong></td>
+          <td>Falls out of currency being the axis. A fund with a USD collection
+            account in New York and a EUR account in Frankfurt is ordinary, and one
+            party-level country question could not express it. This also lets the
+            existing 40-jurisdiction field engine drive each account independently.</td>
+          <td><span class="pill pill--ok">Evidenced</span></td>
+        </tr>
+        <tr>
+          <td><strong>Purpose stays out of the account key; the reference line is built for you</strong></td>
+          <td>Follows the convention rather than inventing one. The reference is
+            assembled read-only from the ADF's own token order — the deal half from
+            the facility, the payment half per payment — so nobody has to remember
+            a format that paper forms leave as an empty box.</td>
+          <td><span class="pill pill--ok">Evidenced</span></td>
+        </tr>
+        <tr>
+          <td><strong>"Add another account?" as a second step on the same page</strong></td>
+          <td>The answer is usually no. A full screen transition to say no is a
+            worse experience than a question appearing where the work just
+            finished. Step 1 keeps a running list of what is already added, so the
+            context never disappears.</td>
+          <td><span class="pill pill--inf">Design judgment</span></td>
+        </tr>
+        <tr>
+          <td><strong>A second account inherits the first one's bank</strong></td>
+          <td>The common case is the same custodian with a different purpose. The
+            tag and the sub-account are what differ, so those alone start blank and
+            the next unused tag is pre-selected.</td>
+          <td><span class="pill pill--inf">Design judgment</span></td>
+        </tr>
+        <tr>
+          <td><strong>Ends at maker/checker, not at a callback</strong></td>
+          <td>Matches where the market is going. The callback ending is built too,
+            in amber rather than green, so the two can be compared — which model
+            Interro adopts is a policy decision this prototype should surface, not
+            settle.</td>
+          <td><span class="pill pill--ok">Evidenced</span></td>
+        </tr>
+        <tr>
+          <td><strong>Six party-level fields, and no KYC</strong></td>
+          <td>Legal name, party type, manager, address, country, one operations
+            contact. No LEI, MEI, GIIN, CRN, EIN, tax residence or W-8/W-9 — those
+            belong to the entity master. The party-type list is the 2005
+            Questionnaire's own printed enum, verbatim.</td>
+          <td><span class="pill pill--ok">Evidenced</span></td>
+        </tr>
+        <tr>
+          <td><strong>Account numbers masked to the last four on read-back</strong></td>
+          <td>A summary screen is a screenshot. Routing numbers stay visible —
+            they are public — and account and FFC numbers do not.</td>
+          <td><span class="pill pill--inf">Design judgment</span></td>
+        </tr>
+        <tr>
+          <td><strong>Hyphens stripped before validating</strong></td>
+          <td>The completed CLO form writes its DDA number with a dash in it.
+            Someone transcribing from a PDF will type the dash; rejecting it would
+            be the form being wrong, not the user.</td>
+          <td><span class="pill pill--ok">Evidenced</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>What was deliberately <em>not</em> built</h3>
+
+  <ul>
+    <li>
+      <strong>Non-cash settlement rails.</strong> The completed CLO form carries
+      book-entry/DTC, free physical delivery and DVP delivery instructions
+      alongside its cash wire. That is securities delivery — a different domain,
+      and absorbing it drags in DTC participant codes and physical mail addresses.
+    </li>
+    <li>
+      <strong>Payment method (MT vs ISO 20022).</strong> The March 2023 ADF adds a
+      <code>Payment Method</code> field — <code>MT103 or MT202</code> — and an
+      alternate ISO 20022 block keyed <code>PACS.008 or PACS.009</code>, with
+      Creditor / Creditor Agent replacing Beneficiary / Account With Institution.
+      Real, current, and a genuine gap in this prototype. Left out to keep the
+      account form to one screen; it is the most defensible thing to add next.
+    </li>
+    <li>
+      <strong>The 2005 form's agent-side block.</strong> Where the lender sends
+      money <em>to</em> is deal setup, not the lender onboarding its own details.
+    </li>
+    <li>
+      <strong>Data-room and document-distribution permissioning</strong>
+      (<code>Data Room Access</code>, <code>Doc. Delivery</code>,
+      <code>Recon &amp; Inventory</code>) and the four non-payment contact roles
+      (credit, letter of credit, bid, private/public side). Entitlements plumbing.
+      The only contacts a settlement widget needs are operations and SSI
+      verification.
+    </li>
+  </ul>
+
+  <!-- ================================================================== -->
+  <h2><span class="num">Section 4</span>Where we went beyond the evidence</h2>
+
+  <p>
+    Two of the four purpose tags are ours, not the market's, and the widget should
+    not pretend otherwise.
+  </p>
+
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr><th>Tag</th><th>Basis</th><th>Standing</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Collection account</strong></td>
+          <td>Verbatim from the completed CLO form's own FFC account name, and the
+            account behind its "WIRE INSTRUCTIONS FOR LOAN PRINCIPAL AND INTEREST
+            PAYMENTS" section.</td>
+          <td><span class="pill pill--ok">Verified</span></td>
+        </tr>
+        <tr>
+          <td><strong>Custody account</strong></td>
+          <td>Verbatim, same source — a separately numbered sub-account at the same
+            custodian. Corroborated by ISDA's SSI asset categories, which
+            distinguish <code>SECU</code> (securities) from <code>COPA</code>
+            (commercial payments).</td>
+          <td><span class="pill pill--ok">Verified</span></td>
+        </tr>
+        <tr>
+          <td><strong>Funding account</strong></td>
+          <td>Not a tag on any of the four forms. The 2005 Questionnaire implies
+            the direction split by capturing the agent's instructions separately;
+            we have made it a tag instead.</td>
+          <td><span class="pill pill--inf">Inferred</span></td>
+        </tr>
+        <tr>
+          <td><strong>Other</strong></td>
+          <td>Escape hatch with a free-text label, matching the ADF's own
+            "If lender/entity type does not appear in list, you may provide your
+            own value."</td>
+          <td><span class="pill pill--inf">Inferred</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>
+    One framing correction worth keeping straight, because the widget's own wording
+    could mislead: the tag asks "what is this account for?", but it is
+    <strong>not</strong> a payment-purpose field. Payment purpose (principal vs
+    interest) stays in the reference line, per §2.3. What the tag actually captures
+    is closer to asset class and direction — cash in, securities, cash out — which
+    is the axis ISDA and DTCC key their SSIs on, and is therefore defensible. It is
+    the <em>label</em> that is loose, not the model.
+  </p>
+
+  <!-- ================================================================== -->
+  <h2><span class="num">Section 5</span>Not verified, and open questions</h2>
+
+  <div class="callout callout--warn">
+    <span class="callout__k">Read this before quoting anything above</span>
+    <p>
+      The second research track — private-credit settlement operations, CLO
+      trustee mechanics, and the fraud-control literature — <strong>did not
+      complete</strong>. It stopped partway through on an account spend limit.
+      What is below is what remains genuinely unanswered, not a tidy list of
+      nice-to-haves.
+    </p>
+  </div>
+
+  <ul>
+    <li>
+      <strong>Does "FFA" mean anything in this market at all?</strong> It appears
+      in none of the four documents, which is strong but not conclusive — four
+      documents are four documents. If it is real usage somewhere, we have named
+      the concept differently from the people who will use the widget. Worth one
+      question to Janson, who supplied the forms.
+    </li>
+    <li>
+      <strong>CLO trustee mechanics.</strong> Whether a wire to a CLO should name
+      the trustee rather than the issuer as beneficiary, and how the indenture's
+      collection/payment accounts relate to the FFC sub-accounts a counterparty
+      sees, is unconfirmed. The completed form is consistent with the trustee
+      holding level 1, but one instance is not a rule.
+    </li>
+    <li>
+      <strong>BDCs, insurance separate accounts, SMAs and funds-of-one</strong> —
+      not researched. Any of them could add a structure the two-level model does
+      not hold.
+    </li>
+    <li>
+      <strong>Whether a maker/checker flow is actually sufficient</strong> under
+      whatever policy Interro operates, or whether a callback is required for a
+      <em>change</em> even if not for initial setup. The literature consistently
+      treats changes as higher-risk than first-time setup; the prototype currently
+      treats them alike.
+    </li>
+    <li>
+      <strong>The current (28 January 2025) ADF edition.</strong> Member-gated.
+      Field labels here are from the 2018 and 2023 editions.
+    </li>
+    <li>
+      <strong>Per-purpose accounts as a bespoke arrangement.</strong> Roughly a
+      one-in-ten residual: a fund privately telling an agent "fees to the
+      management company, principal and interest to the custodian" would never
+      appear in a public filing. If we support it, it should be an optional
+      override, never the primary axis.
+    </li>
+    <li>
+      <strong>Vocabulary check with an actual private-credit ops professional.</strong>
+      The prototype's copy has not been read by one. Terms that are safe for both
+      private credit and private equity — the brief asked for both — were chosen on
+      judgment, not tested.
+    </li>
+  </ul>
+
+  <footer class="foot">
+    <p>
+      The prototype contains fabricated demo data. The worked CLO example
+      reproduces the <em>structure</em> of a real completed admin-details form
+      supplied privately by Quorim; every name and number in it is invented, and
+      the source document is not in this repository — publishing a live entity's
+      real wire coordinates is the raw material for exactly the misdirected-payment
+      fraud this market's verification apparatus exists to prevent.
+    </p>
+    <p>
+      Jurisdiction field requirements come from
+      <em>International Wire Address Formats v2</em>; see that report for sourcing
+      and for the requirements flagged there as unverified.
+    </p>
+    <p><a href="index.html">← Open the prototype</a> &nbsp;·&nbsp;
+       <a href="../../index.html">All prototypes</a></p>
+  </footer>
+
+</div>
+</body>
+</html>

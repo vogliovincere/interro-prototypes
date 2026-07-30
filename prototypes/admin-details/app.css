@@ -1,0 +1,475 @@
+/* =============================================================================
+   Interro — Settlement Instructions Onboarding (mobile widget prototype)
+
+   This sheet is a DELTA. It loads after ../capital-call-wire-details/app.css
+   (frame, dev panel, buttons, cards, rows, modal, toast) and
+   ../distributions/app.css (form fields, chips, error summary, terminal screens)
+   and reuses both wholesale — the three widgets are one product and must not
+   drift apart visually.
+
+   Everything below is specific to what this flow does that the other two do not:
+   hold a LIST of accounts, tag each one, and show two levels of account nesting
+   as a visible hierarchy rather than a flat run of inputs.
+   ========================================================================== */
+
+/* ==========================================================================
+   Screen 1 — the deal that asked
+   Deliberately not an amount card. Nothing is being paid here, and a figure on
+   this screen would imply otherwise. It names the facility instead.
+   ========================================================================== */
+
+.dealcard { padding: 0; margin-bottom: 20px; overflow: hidden; }
+
+.dealcard__head { padding: 14px 16px 13px; }
+
+.dealcard__borrower {
+  margin: 0 0 3px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--interro-green);
+  line-height: 1.3;
+}
+
+.dealcard__meta {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--gray-500);
+}
+
+.dealcard__foot {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 16px;
+  background: var(--interro-green-soft);
+  border-top: 1px solid var(--gray-200);
+}
+
+.dealcard__foot .label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--interro-green);
+}
+
+.dealcard__foot .value {
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--interro-green);
+  text-align: right;
+}
+
+/* ==========================================================================
+   Grouping inside a long form
+   The account screen asks four different kinds of question — what for, how
+   held, where, and the numbers. Running them together as twelve unlabelled
+   inputs is what makes admin-details PDFs unreadable, so each group gets a
+   heading and its own visual block.
+   ========================================================================== */
+
+.fsection {
+  margin-bottom: 22px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--gray-200);
+}
+.fsection:last-of-type { border-bottom: 0; }
+
+.fsection__title {
+  margin: 0 0 4px;
+  font-size: 13.5px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--interro-green);
+}
+
+.fsection__sub {
+  margin: 0 0 14px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--gray-500);
+}
+
+/* Level 2 is indented and rule-marked so the nesting is visible at a glance —
+   the whole point is that this account sits INSIDE the one above it. */
+.fsection--l2 {
+  position: relative;
+  padding-left: 14px;
+  margin-left: 2px;
+  border-left: 3px solid var(--interro-accent);
+  border-bottom: 0;
+}
+
+/* ==========================================================================
+   The two steps on one page
+   Details, then "any more?". A step marker rather than a second screen: the
+   answer is almost always no, and a full screen transition to say so reads as
+   an extra chore.
+   ========================================================================== */
+
+.substeps {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.substep {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 650;
+  color: var(--gray-400);
+}
+
+.substep__n {
+  display: grid;
+  place-items: center;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--gray-100);
+  color: var(--gray-400);
+  font-size: 10.5px;
+  font-weight: 800;
+}
+
+.substep.is-on { color: var(--interro-green); }
+.substep.is-on .substep__n { background: var(--interro-green); color: #fff; }
+.substep.is-done { color: var(--interro-accent); }
+.substep.is-done .substep__n { background: var(--interro-accent-soft); color: var(--interro-accent); }
+
+/* Confirmation of the account just saved, at the top of step 2. Without it the
+   screen asks "any others?" with no evidence the first one took. */
+.savedok {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 12px 14px;
+  margin-bottom: 18px;
+  background: var(--interro-accent-soft);
+  border: 1px solid #cfe8db;
+  border-radius: var(--radius);
+}
+
+.savedok__tick {
+  display: grid;
+  place-items: center;
+  width: 22px; height: 22px;
+  min-width: 22px;
+  border-radius: 50%;
+  background: var(--success);
+  color: #fff;
+}
+.savedok__tick svg { width: 12px; height: 12px; }
+
+.savedok__title {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--interro-green);
+}
+
+.savedok__sub {
+  margin: 2px 0 0;
+  font-size: 11.5px;
+  color: var(--gray-500);
+}
+
+/* ==========================================================================
+   Choice rows — sub-line and action variant
+   .choice itself comes from the capital-call sheet. It has a title but no
+   second line, and these choices genuinely need one: "Collection account" does
+   not tell an ops person what goes in it.
+   ========================================================================== */
+
+.choice__sub {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--gray-500);
+}
+
+/* Yes/no actions rather than a selection — no radio, so no persistent
+   aria-pressed state and no selected styling. */
+.choice--action { min-height: 68px; }
+.choice--action .choice__icon { width: 42px; height: 42px; min-width: 42px; border-radius: 10px; }
+.choice--action .choice__icon svg { width: 20px; height: 20px; }
+.choice--action .choice__title { font-size: 15px; }
+
+/* ==========================================================================
+   The account list
+   One party, several accounts. This is the object the whole widget exists to
+   build, so it gets a real card with the tag stated first — an ops person
+   scanning a party's record is looking for "which one is the cash account",
+   not for a bank name.
+   ========================================================================== */
+
+.acctlist { display: grid; gap: 12px; margin-bottom: 18px; }
+
+.acctlist__title {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--gray-400);
+}
+
+.acctcard {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 13px 15px;
+  box-shadow: var(--shadow-sm);
+}
+
+.acctlist--compact .acctcard { padding: 10px 13px; box-shadow: none; background: var(--gray-100); }
+
+.acctcard__top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 7px;
+}
+
+.acctcard__line {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--gray-500);
+  font-family: var(--font-mono);
+}
+
+.acctcard__rows {
+  margin-top: 11px;
+  padding-top: 10px;
+  border-top: 1px solid var(--gray-200);
+  display: grid;
+  gap: 6px;
+}
+
+.acctcard__edit {
+  margin-left: auto;
+  background: none;
+  border: 0;
+  padding: 2px 4px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--interro-accent);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.acctcard__remove {
+  margin-top: 11px;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-size: 11.5px;
+  color: var(--gray-400);
+  cursor: pointer;
+  text-decoration: underline;
+}
+.acctcard__remove:hover { color: var(--error); }
+
+/* The tag. Colour-coded by purpose because the point of promoting it out of the
+   account NAME is that it becomes scannable. Cash green, securities gold,
+   outbound neutral-blue, other grey. */
+.accttag {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 100px;
+  background: var(--gray-100);
+  color: var(--gray-500);
+}
+
+.accttag--collection { background: var(--interro-green); color: #fff; }
+.accttag--custody    { background: var(--interro-gold-soft); color: var(--interro-gold-dark); }
+.accttag--funding    { background: #eaf0fb; color: #2f5cb5; }
+.accttag--other      { background: var(--gray-100); color: var(--gray-500); }
+
+/* "2-level" marker — states that this account has an FFC beneath it, which is
+   the single most consequential fact about it. */
+.accttag--levels {
+  background: transparent;
+  color: var(--interro-accent);
+  border: 1px solid #cfe8db;
+}
+
+.miniRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.miniRow__k {
+  font-size: 11.5px;
+  color: var(--gray-500);
+  line-height: 1.4;
+}
+
+.miniRow__v {
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--ink);
+  text-align: right;
+  word-break: break-word;
+}
+.miniRow__v.mono { font-family: var(--font-mono); font-weight: 600; letter-spacing: 0.01em; }
+
+.reviewhead {
+  margin: 24px 0 10px;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--interro-green);
+}
+
+.linkbtn {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--interro-accent);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   The reference line
+   Read-only on purpose: half of it comes from the facility and half is
+   per-payment, so there is nothing here to type. Shown as a code block because
+   it IS a format — the LSTA prints it as three token lines and every paper form
+   leaves it as an empty box someone fills in from memory.
+   ========================================================================== */
+
+.refbuild {
+  margin: 4px 0 20px;
+  padding: 12px 14px;
+  background: #f7f9fb;
+  border: 1px dashed var(--gray-300);
+  border-radius: var(--radius);
+}
+
+.refbuild__label {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gray-500);
+}
+
+.refbuild__body {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1.65;
+  color: var(--interro-green);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.refbuild__note {
+  margin: 9px 0 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--gray-500);
+}
+
+/* One-tap fill for the FFC name, following the convention the Jamestown form
+   writes by hand ("<entity> / Collection Account"). Offered rather than forced:
+   a party whose custodian uses a different convention must be able to ignore it. */
+.ffcbuild {
+  display: block;
+  width: 100%;
+  margin-top: -6px;
+  padding: 9px 12px;
+  background: var(--interro-accent-soft);
+  border: 1px dashed #bcdccb;
+  border-radius: var(--radius);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--interro-accent);
+  text-align: left;
+  cursor: pointer;
+}
+.ffcbuild:hover { background: #e3f2e9; border-color: var(--interro-accent); }
+
+/* ==========================================================================
+   Screen 5 — approval status
+   Not a spinner-then-tick like the distribution flow. Nothing is being verified
+   in real time here; a second human has to approve, which takes a day. Showing
+   a fake progress animation for that would be a lie about the timeline.
+   ========================================================================== */
+
+.statuscard { padding: 4px 0; margin-bottom: 18px; text-align: left; }
+
+.statusrow {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 11px 15px;
+  border-bottom: 1px solid var(--gray-200);
+}
+.statusrow:last-child { border-bottom: 0; }
+
+.statusrow__t {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--ink);
+}
+
+.statusrow__s {
+  margin: 2px 0 0;
+  font-size: 11.5px;
+  color: var(--gray-500);
+}
+
+.statusrow__tick {
+  display: grid;
+  place-items: center;
+  width: 18px; height: 18px;
+  min-width: 18px;
+  margin-top: 1px;
+  border-radius: 50%;
+  background: var(--success);
+  color: #fff;
+}
+.statusrow__tick svg { width: 10px; height: 10px; }
+
+.statusrow__dot {
+  width: 18px; height: 18px;
+  min-width: 18px;
+  margin-top: 1px;
+  border-radius: 50%;
+  border: 2px solid var(--gray-200);
+}
+
+.statusrow.is-pending .statusrow__t { color: var(--gray-400); }
+.statusrow.is-pending .statusrow__s { color: var(--gray-400); }
+
+/* The callback ending is the one Interro should probably NOT ship, so its icon
+   is amber rather than green — it is a waiting state, not a success. */
+.terminal__icon--wait {
+  background: var(--interro-gold-soft);
+  color: var(--interro-gold-dark);
+}
+
+/* The account list inside a terminal screen inherits centred text from
+   .terminal; its rows are data and must read left-aligned. */
+.terminal .acctlist { text-align: left; }

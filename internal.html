@@ -61,6 +61,9 @@
       color: #8a6d00; background: #fdf3d3;
       padding: 4px 9px; border-radius: 100px;
     }
+    /* The write-up is a document, not a prototype, and carries no ?dev=1. */
+    a.proto--doc { border-left-color: var(--interro-gold); }
+    a.proto--doc h2 { font-size: 15.5px; }
     footer { color: rgba(255,255,255,.5); font-size: 12.5px; margin-top: 28px; line-height: 1.6; }
     footer a { color: var(--interro-accent); }
   </style>
@@ -100,6 +103,30 @@
         the success screen in either its verifying or completed phase.
       </p>
       <span class="meta">4 screens · 40 jurisdictions · dev tools</span>
+    </a>
+
+    <a class="proto" href="prototypes/admin-details/index.html?dev=1">
+      <h2>Onboarding a Party's Settlement Details →</h2>
+      <p>
+        The private-credit flow: a standing record holding several tagged accounts,
+        nesting two levels deep (DDA → FFC). Dev tools load a worked CLO example
+        with two sub-accounts inside one trustee account, switch each account's
+        bank country, flip the whole two-level model off to show what a naive flat
+        form would ship, and hold the ending in maker/checker, callback or
+        published.
+      </p>
+      <span class="meta">5 screens · multi-account · dev tools</span>
+    </a>
+
+    <a class="proto proto--doc" href="prototypes/admin-details/research.html">
+      <h2>Research &amp; Design Decisions →</h2>
+      <p>
+        The write-up behind the third prototype. Read §4 and §5 before presenting
+        it — they say which account tags are ours rather than the market's, and
+        which questions are still open because the second research track did not
+        finish.
+      </p>
+      <span class="meta">Write-up</span>
     </a>
 
     <footer>

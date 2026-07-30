@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="interro-green">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interro · Settlement Instructions Onboarding</title>
+  <link rel="stylesheet" href="../../brand/tokens.css" />
+  <link rel="stylesheet" href="../shared/picker.css" />
+  <!-- Two sheets are loaded as base layers before this prototype's own delta.
+       Neither is modified — the capital-call and distribution prototypes are
+       left exactly as they were.
+
+         capital-call/app.css  the shell: phone frame, dev console, buttons,
+                               cards, rows, modal, toast.
+         distributions/app.css the form and terminal layers: .intro__lede,
+                               .steps, .gotcha, .reqchip, .errsum, .terminal,
+                               .summary, .spinner.
+
+       Stacking them beats a third copy of a thousand lines that would drift
+       within a week. The cost is some inert CSS (.distcard, .checkitem) that
+       this flow never uses, which is cheaper than the drift. If a fourth
+       prototype appears, the shared layers should be lifted into
+       prototypes/shared/ — but that is a change to the existing two, and this
+       round was asked to leave them alone. -->
+  <link rel="stylesheet" href="../capital-call-wire-details/app.css" />
+  <link rel="stylesheet" href="../distributions/app.css" />
+  <link rel="stylesheet" href="app.css" />
+</head>
+<body>
+
+<div class="stage">
+
+  <!-- ======================================================================
+       DEV TOOLS — demo scaffolding, lives OUTSIDE the mobile frame.
+       Never ships; exists so the flow and its variants can be driven live.
+       Hidden unless the URL carries ?dev=1 — see the .devmode rule in app.css.
+       ==================================================================== -->
+  <aside class="dev">
+    <div class="dev__title">Dev tools</div>
+
+    <section class="dev__group">
+      <p class="dev__label">Flow</p>
+      <div class="dev__nav">
+        <button class="dev__navitem" data-goto="intro">1 · What this is</button>
+        <button class="dev__navitem" data-goto="party">2 · The party</button>
+        <button class="dev__navitem" data-goto="accounts">3 · Accounts</button>
+        <button class="dev__navitem" data-goto="review">4 · Review</button>
+        <button class="dev__navitem" data-goto="done">5 · Submitted</button>
+      </div>
+    </section>
+
+    <!-- The demo that sells the whole thing: a worked CLO, shaped exactly like
+         the completed admin-details form Quorim supplied. The STRUCTURE is real;
+         the names and numbers are invented, because this repo is mirrored to a
+         public site and the source document holds a live CLO's live wire
+         coordinates. See the note above seedCloExample() in app.js. -->
+    <section class="dev__group">
+      <p class="dev__label">Seed data</p>
+      <button class="dev__reset" id="dev-seed">Load the worked CLO example</button>
+      <p class="dev__hint">
+        Two tagged sub-accounts inside one trustee DDA — collection and custody —
+        which is the shape a flat one-account form cannot hold.
+      </p>
+    </section>
+
+    <section class="dev__group">
+      <p class="dev__label">Party type</p>
+      <select class="dev__select" id="dev-entity"></select>
+    </section>
+
+    <!-- The feature this prototype exists to evaluate. Off = one flat account
+         with no tag and no second level, i.e. what a naive form would ship. -->
+    <section class="dev__group">
+      <p class="dev__label">Two-level accounts &amp; tagging</p>
+      <label class="dev__check">
+        <input type="checkbox" id="dev-twolevel" checked />
+        <span>Ask DDA vs FFC structure &amp; tag each account</span>
+      </label>
+      <div class="dev__sub" id="dev-twolevel-sub">
+        <label class="dev__check">
+          <input type="checkbox" id="dev-ffcbuild" checked />
+          <span>Offer to build the FFC account name</span>
+        </label>
+      </div>
+    </section>
+
+    <section class="dev__group">
+      <p class="dev__label">Account being edited</p>
+      <p class="dev__label" style="margin-top:8px">Bank country</p>
+      <select class="dev__select" id="dev-country"></select>
+      <p class="dev__hint" id="dev-schema-note"></p>
+      <div class="dev__seg dev__seg--col" data-seg="structure">
+        <button data-structure="dedicated">Dedicated account (1 level)</button>
+        <button data-structure="omnibus">Custodian sub-account (2 levels)</button>
+      </div>
+    </section>
+
+    <section class="dev__group">
+      <p class="dev__label">Form behaviour</p>
+      <label class="dev__check">
+        <input type="checkbox" id="dev-uslabels" checked />
+        <span>Show U.S. equivalent under each field</span>
+      </label>
+      <label class="dev__check">
+        <input type="checkbox" id="dev-hints" checked />
+        <span>Show “where to find it” hints</span>
+      </label>
+      <label class="dev__check">
+        <input type="checkbox" id="dev-reference" checked />
+        <span>Show the standard reference-line builder</span>
+      </label>
+      <label class="dev__check">
+        <input type="checkbox" id="dev-prefill" />
+        <span>Prefill with valid sample data</span>
+      </label>
+    </section>
+
+    <!-- ADFlow's stated benefit is "Remove Call-Backs", replaced by maker/checker
+         + version history. Both endings are togglable because which one Interro
+         ships is a policy decision, not a design one. -->
+    <section class="dev__group">
+      <p class="dev__label">Submitted screen</p>
+      <div class="dev__seg dev__seg--col" data-seg="done">
+        <button data-done="checker">Awaiting maker/checker approval</button>
+        <button data-done="callback">Awaiting phone callback</button>
+        <button data-done="published">Published</button>
+      </div>
+    </section>
+
+    <section class="dev__group dev__group--last">
+      <button class="dev__reset" id="dev-reset">Reset demo</button>
+    </section>
+  </aside>
+
+  <!-- ======================================================================
+       MOBILE FRAME — same 390px widget geometry as the other two flows.
+       ==================================================================== -->
+  <div class="phone">
+    <div class="phone__scroll" id="scroll">
+
+      <header class="wtop">
+        <img class="wtop__logo" src="../../brand/interro-logo.png" alt="interro" />
+        <span class="wtop__ctx">Settlement Details</span>
+      </header>
+
+      <div class="progress" id="progress" role="progressbar"
+           aria-valuemin="1" aria-valuemax="5" aria-label="Progress"></div>
+
+      <main id="app" class="screen"><!-- rendered by app.js --></main>
+
+      <footer class="powered">
+        <span>Powered by</span>
+        <img src="../../brand/interro-logo.png" alt="Interro" />
+      </footer>
+    </div>
+
+    <div class="modalroot" id="modal-root"></div>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </div>
+
+</div>
+
+<script src="../shared/countries.js"></script>
+<script src="../shared/wireReceive.js"></script>
+<script src="../shared/picker.js"></script>
+<script src="adf.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

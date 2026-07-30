@@ -48,6 +48,11 @@
       color: var(--interro-accent); background: var(--interro-accent-soft);
       padding: 4px 9px; border-radius: 100px;
     }
+    /* The write-up is a document, not a prototype — gold rule and quieter
+       heading so it reads as supporting material rather than a fourth widget. */
+    a.proto--doc { border-left-color: var(--interro-gold); }
+    a.proto--doc h2 { font-size: 15.5px; }
+    a.proto--doc .meta { color: var(--interro-gold-dark); background: var(--interro-gold-soft); }
     footer { color: rgba(255,255,255,.45); font-size: 12.5px; margin-top: 28px; }
   </style>
 </head>
@@ -79,6 +84,30 @@
         each.
       </p>
       <span class="meta">4 screens · 40 jurisdictions</span>
+    </a>
+
+    <a class="proto" href="prototypes/admin-details/index.html">
+      <h2>Onboarding a Party's Settlement Details →</h2>
+      <p>
+        Built for private credit, where wire details are collected at onboarding
+        rather than triggered by a payment — so a party registers a
+        <em>standing record</em>, and it holds as many accounts as they settle
+        through. Each is tagged by purpose and can nest two levels deep,
+        <strong>DDA then FFC</strong>, which is how money reaches a fund sitting
+        inside a custodian's account.
+      </p>
+      <span class="meta">5 screens · multi-account · DDA / FFC</span>
+    </a>
+
+    <a class="proto proto--doc" href="prototypes/admin-details/research.html">
+      <h2>Research &amp; Design Decisions →</h2>
+      <p>
+        What four real administrative details forms actually contain, the market
+        conventions they revealed, and the reasoning behind every choice in the
+        prototype above — including the two account tags we invented, and the
+        questions still open.
+      </p>
+      <span class="meta">Write-up</span>
     </a>
 
     <footer>
