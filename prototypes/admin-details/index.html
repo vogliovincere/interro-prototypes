@@ -24,7 +24,17 @@
        round was asked to leave them alone. -->
   <link rel="stylesheet" href="../capital-call-wire-details/app.css" />
   <link rel="stylesheet" href="../distributions/app.css" />
-  <link rel="stylesheet" href="app.css" />
+  <!-- ?v= is a cache buster, and it is not decoration. GitHub Pages serves these
+       files with Cache-Control: max-age=600, so for ten minutes after a deploy a
+       browser that already has the page reuses the OLD app.js and app.css without
+       even asking - which looks exactly like a fix that did not work. Changing the
+       query string changes the URL, so the new file is fetched immediately.
+
+       BUMP THIS on any change to app.css, adf.js or app.js. It is the difference
+       between "fixed" and "fixed, and the person you sent the link to can see it".
+       Only this prototype's own assets carry it; the two shared sheets above
+       belong to the other prototypes and are left exactly as they are. -->
+  <link rel="stylesheet" href="app.css?v=4" />
 </head>
 <body>
 
@@ -157,7 +167,8 @@
 <script src="../shared/countries.js"></script>
 <script src="../shared/wireReceive.js"></script>
 <script src="../shared/picker.js"></script>
-<script src="adf.js"></script>
-<script src="app.js"></script>
+<!-- ?v= must match the stylesheet above — see the note in <head>. -->
+<script src="adf.js?v=4"></script>
+<script src="app.js?v=4"></script>
 </body>
 </html>

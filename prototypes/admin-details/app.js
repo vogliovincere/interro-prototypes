@@ -891,27 +891,69 @@ function render() {
     state.substep = 'details';
   }
 
-  /* SCROLL. This whole file re-renders the screen from scratch on every state
-     change, which means picking a bank country, choosing a purpose tag, switching
-     the account structure or tripping a validation message all come through here.
-     Scrolling to the top on all of them threw the reader back to the heading every
-     time they touched a control halfway down a long form.
+  /* HOLDING THE READER'S PLACE.
 
-     So: jump to the top only when the VIEW actually changes — a new screen, or the
-     move between the two steps of the account page. A re-render of the same view
-     holds position, because the reader's eye is already where they were working.
-     Set directly rather than smooth-scrolled; an animation back to the same offset
-     is a visible twitch. */
+     This whole file re-renders the screen from scratch on every state change, so
+     picking a bank country, choosing a currency, choosing a purpose tag,
+     switching the account structure and tripping a validation message all come
+     through here. Scrolling to the top on all of them threw the reader back to
+     the heading every time they touched a control halfway down a long form.
+
+     The rule is about navigation, not rendering: go to the top only when the VIEW
+     changes — a new screen, or the move between the two steps of the account
+     page. A re-render of the same view keeps both the scroll offset AND the
+     focused control, because the reader is still in the same place doing the same
+     thing.
+
+     Two details that matter:
+
+     • WHICH element scrolls depends on the window. Above 720px the frame is a
+       fixed height and .phone__scroll scrolls; below it the frame goes auto-height
+       (see the media query in the capital-call sheet) and the DOCUMENT scrolls
+       instead. Both are captured, because assuming the inner one silently does
+       nothing on a narrow window.
+     • FOCUS is restored before the scroll, with preventScroll, because focusing an
+       element otherwise scrolls it into view and would undo the offset we just
+       went to the trouble of keeping. */
   const view = `${state.screen}:${state.substep}:${state.editIndex}`;
   const sameView = view === lastView;
-  const keepY = scroll.scrollTop;
+
+  const keepInner = scroll.scrollTop;
+  const keepDoc = document.scrollingElement ? document.scrollingElement.scrollTop : 0;
+
+  // Remember the focused control so a re-render does not drop the reader out of
+  // the field they were in. Selection is only meaningful on text inputs; asking a
+  // <select> for selectionStart throws in some browsers, so it is guarded.
+  const active = document.activeElement;
+  const focusId = sameView && active && app.contains(active) && active.id ? active.id : null;
+  let selStart = null;
+  let selEnd = null;
+  if (focusId && active.tagName === 'INPUT') {
+    try { selStart = active.selectionStart; selEnd = active.selectionEnd; } catch (_) {}
+  }
 
   app.innerHTML = SCREENS[state.screen]();
   renderProgress();
   syncDev();
 
-  if (sameView) scroll.scrollTop = keepY;
-  else scroll.scrollTo({ top: 0, behavior: 'smooth' });
+  if (sameView) {
+    if (focusId) {
+      const again = document.getElementById(focusId);
+      if (again) {
+        try { again.focus({ preventScroll: true }); } catch (_) { again.focus(); }
+        if (selStart !== null) {
+          try { again.setSelectionRange(selStart, selEnd); } catch (_) {}
+        }
+      }
+    }
+    scroll.scrollTop = keepInner;
+    if (document.scrollingElement) document.scrollingElement.scrollTop = keepDoc;
+  } else {
+    scroll.scrollTo({ top: 0, behavior: 'smooth' });
+    if (document.scrollingElement) {
+      document.scrollingElement.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
 
   lastView = view;
 }
@@ -1094,20 +1136,19 @@ app.addEventListener('input', (e) => {
   }
 });
 
-/* Re-render only when the error state actually flips, so the caret is not yanked
-   out of the input on every keystroke. */
+/* Re-render only when the error state actually FLIPS. Re-rendering on every
+   keystroke would be wasteful, and the message does not change in between.
+
+   Focus and caret restoration used to live here. It is now render()'s job for any
+   same-view re-render, which covers this case and the selects as well — two
+   mechanisms both trying to restore focus would only fight each other. */
 function liveRevalidate(el, fields, errors, key) {
   const f = fields.find((x) => x.key === key);
   if (!f) return;
   const msg = validateField(f, el.value);
   const had = errors[key];
   if (msg) errors[key] = msg; else delete errors[key];
-  if (!!msg !== !!had) {
-    const pos = el.selectionStart;
-    render();
-    const again = document.getElementById(`f-${key}`);
-    if (again) { again.focus(); try { again.setSelectionRange(pos, pos); } catch (_) {} }
-  }
+  if (!!msg !== !!had) render();
 }
 
 app.addEventListener('change', (e) => {
