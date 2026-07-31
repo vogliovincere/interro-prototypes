@@ -94,7 +94,6 @@ const state = {
   ffcBuild: true,        // dev tools
   usLabels: true,        // dev tools
   hints: true,           // dev tools
-  reference: true,       // dev tools
 };
 
 const app = document.getElementById('app');
@@ -112,7 +111,6 @@ const modalRoot = document.getElementById('modal-root');
   if (q.get('twolevel') === '0') state.twoLevel = false;
   if (q.get('us') === '0') state.usLabels = false;
   if (q.get('hints') === '0') state.hints = false;
-  if (q.get('reference') === '0') state.reference = false;
 
   const cc = (q.get('country') || '').toUpperCase();
   if (cc) {
@@ -132,6 +130,10 @@ const modalRoot = document.getElementById('modal-root');
 
   const s = q.get('screen');
   if (['accounts', 'review', 'done'].includes(s)) state.screen = s;
+
+  // `step` is what history navigation writes for the second half of the accounts
+  // page, so it has to be read back or a copied URL lands on the wrong step.
+  if (q.get('step') === 'another') state.substep = 'another';
 
   const d = q.get('done');
   if (['checker', 'callback', 'published'].includes(d)) state.donePhase = d;
@@ -304,24 +306,21 @@ function structureChoices() {
     </div>`;
 }
 
-/* The assembled standard reference line. Read-only: the deal half comes from the
-   facility and the payment half is per-payment, so there is nothing here to type.
-   Showing it answers the question the free-text "Reference" box on every paper
-   form leaves open. */
-function referenceBlock() {
-  const line3 = `${window.adfPurpose(state.draft.purpose).label} [Transaction Reference ID]`;
-  return `
-    <div class="refbuild">
-      <p class="refbuild__label">Reference line every payment will carry</p>
-      <pre class="refbuild__body">${escapeHtml(DEAL.borrower)}
-${escapeHtml(DEAL.facility + ' ' + DEAL.cusip)}
-${escapeHtml(line3)}</pre>
-      <p class="refbuild__note">
-        The LSTA/LMA standard format. Interro fills this in — you do not have to
-        remember it, and it is why payments get applied to the right facility.
-      </p>
-    </div>`;
-}
+/* REMOVED: the reference-line preview.
+
+   This screen used to show the assembled LSTA/LMA standard reference line under a
+   heading reading "Reference line every payment will carry", with a note saying
+   Interro fills it in. It was cut after review, and for a good reason: the flow
+   collects standing details and moves no money, so a block describing what a
+   payment will carry read as though something were being processed now. "Interro
+   fills this in" made that worse, since in the demo the payer is Interro Agency
+   Services while in the product Interro is the platform and the payer is the agent.
+
+   The underlying finding still stands and still shapes the model — payment purpose
+   belongs in the reference line rather than in a separate account, which is why
+   there is no principal-versus-interest split here. See research.html section 2.3.
+   If the format is ever worth showing again, it belongs next to a payment, not next
+   to the account being registered. */
 
 function screenAccounts() {
   return state.substep === 'another' ? substepAnother() : substepDetails();
@@ -382,34 +381,36 @@ function substepDetails() {
     <section class="fsection">
       <p class="fsection__title">Where is the account?</p>
 
-      <div class="fgroup">
-        <label class="flabel" for="acct-country-trigger">
-          Country of the bank <span class="req">*</span>
-        </label>
-        ${CountryPicker.trigger({
-          selected: d.country,
-          placeholder: 'Select country',
-          id: 'acct-country-trigger',
-        })}
-        ${state.hints ? `
-          <p class="fhelp">
-            Asked per account, not once — the fields below change with it. An
-            account in ${d.country.name} needs
-            ${s.usesIban ? 'an IBAN' : 'a national routing code, not an IBAN'}.
-          </p>` : ''}
-      </div>
+      <div class="fgrid">
+        <div class="fgroup fgroup--narrow">
+          <label class="flabel" for="acct-country-trigger">
+            Country of the bank <span class="req">*</span>
+          </label>
+          ${CountryPicker.trigger({
+            selected: d.country,
+            placeholder: 'Select country',
+            id: 'acct-country-trigger',
+          })}
+          ${state.hints ? `
+            <p class="fhelp">
+              Asked per account, not once — the fields below change with it. An
+              account in ${d.country.name} needs
+              ${s.usesIban ? 'an IBAN' : 'a national routing code, not an IBAN'}.
+            </p>` : ''}
+        </div>
 
-      <div class="fgroup">
-        <label class="flabel" for="f-currency">Currency <span class="req">*</span></label>
-        <select class="finput" id="f-currency" data-own="currency">
-          ${window.ADF_CURRENCIES.map((c) =>
-            `<option value="${c}" ${d.currency === c ? 'selected' : ''}>${c}</option>`).join('')}
-        </select>
-        ${state.hints ? `
-          <p class="fhelp">
-            One account per currency. If you settle ${d.currency} and something else
-            through different accounts, add both.
-          </p>` : ''}
+        <div class="fgroup fgroup--narrow">
+          <label class="flabel" for="f-currency">Currency <span class="req">*</span></label>
+          <select class="finput" id="f-currency" data-own="currency">
+            ${window.ADF_CURRENCIES.map((c) =>
+              `<option value="${c}" ${d.currency === c ? 'selected' : ''}>${c}</option>`).join('')}
+          </select>
+          ${state.hints ? `
+            <p class="fhelp">
+              One account per currency. If you settle ${d.currency} and something else
+              through different accounts, add both.
+            </p>` : ''}
+        </div>
       </div>
     </section>
 
@@ -428,8 +429,10 @@ function substepDetails() {
           The custodian's own account at the bank. This is what the routing number
           reaches.
         </p>` : ''}
-      ${[fields[0]].concat(s.fields).map((f) =>
-        fieldHtml(f, ownOrValue(f.key), state.acctErrors[f.key], state.acctSubmitted)).join('')}
+      <div class="fgrid">
+        ${[fields[0]].concat(s.fields).map((f) =>
+          fieldHtml(f, ownOrValue(f.key), state.acctErrors[f.key], state.acctSubmitted)).join('')}
+      </div>
     </section>
 
     ${twoLevel ? `
@@ -439,15 +442,15 @@ function substepDetails() {
           “For further credit”. Without it the wire reaches the custodian and stops
           there — credited to nobody, with no error raised.
         </p>
-        ${fields.slice(1).map((f) =>
-          fieldHtml(f, ownOrValue(f.key), state.acctErrors[f.key], state.acctSubmitted)).join('')}
+        <div class="fgrid">
+          ${fields.slice(1).map((f) =>
+            fieldHtml(f, ownOrValue(f.key), state.acctErrors[f.key], state.acctSubmitted)).join('')}
+        </div>
         ${state.ffcBuild && d.purpose !== 'other' && d.accountName.trim() ? `
           <button type="button" class="ffcbuild" id="ffc-build">
             Use “${escapeHtml(suggestedFfcName())}”
           </button>` : ''}
       </section>` : ''}
-
-    ${state.reference ? referenceBlock() : ''}
 
     <div class="fgroup">
       <label class="flabel" for="f-special">Special instructions</label>
@@ -817,6 +820,12 @@ function fieldHtml(f, value, err, submitted) {
       ? '<span class="reqchip reqchip--optional">Optional</span>'
       : '<span class="req">*</span>';
 
+  /* Width hint for the desktop grid. Identifiers and pickers are short and fixed
+     in length, so two fit comfortably on a row; names and addresses are free text
+     of unpredictable length and get the full width. Ignored entirely on narrow
+     screens, where everything is one column. */
+  const span = f.type === 'text' ? 'fgroup--wide' : 'fgroup--narrow';
+
   const control = f.type === 'select'
     ? `<select class="finput ${showErr ? 'is-error' : ''}" id="${id}" ${attr}="${f.key}">
          <option value="">Select…</option>
@@ -833,7 +842,7 @@ function fieldHtml(f, value, err, submitted) {
               autocomplete="off" spellcheck="false" />`;
 
   return `
-    <div class="fgroup" id="g-${f.key}">
+    <div class="fgroup ${span}" id="g-${f.key}">
       <label class="flabel" for="${id}">
         ${f.label}${chip}
         ${state.usLabels && f.us ? `<span class="flabel__us">${f.us}</span>` : ''}
@@ -879,6 +888,76 @@ function renderProgress() {
 /* Which view was on screen at the end of the last render, so the next one can
    tell navigation apart from a re-render. */
 let lastView = null;
+
+/* ---------------------------------------------------------------- history ---
+
+   The browser back button has to work. Without this the widget is a single
+   document that never changes URL, so back leaves the prototype entirely — which
+   in an embedded context means navigating the host page away, and in a demo means
+   losing the whole flow because someone reached for the obvious control.
+
+   Each view change pushes an entry, so back and forward walk the screens. The URL
+   is updated to match, which means any point in the flow can also be copied out of
+   the address bar and shared — the same deep links readUrl() already understands.
+
+   Accounts already added are NOT unwound by going back. Back moves between
+   screens; it is not an undo stack. Re-entering the accounts screen still shows
+   everything saved, which is what someone pressing back to check a field expects.
+
+   pushState throws on some file:// origins, so every call is guarded. The flow has
+   to keep working when the folder is opened straight off disk. */
+
+let suppressPush = false;
+
+const historyState = () => ({
+  interro: true,           // marks entries as ours, so foreign ones are ignored
+  screen: state.screen,
+  substep: state.substep,
+  editIndex: state.editIndex,
+});
+
+function historyUrl() {
+  const q = new URLSearchParams(location.search);
+  q.set('screen', state.screen);
+  if (state.screen === 'accounts' && state.substep === 'another') q.set('step', 'another');
+  else q.delete('step');
+  return `${location.pathname}?${q.toString()}`;
+}
+
+function syncHistory(isFirst) {
+  try {
+    if (isFirst) history.replaceState(historyState(), '', historyUrl());
+    else history.pushState(historyState(), '', historyUrl());
+  } catch (_) {
+    // file:// origins can refuse a URL change. Losing the address bar is
+    // acceptable; throwing here and killing the render is not.
+  }
+}
+
+window.addEventListener('popstate', (e) => {
+  const s = e.state;
+  if (!s || !s.interro) return;
+
+  state.screen = s.screen;
+  state.substep = s.substep;
+  state.editIndex = s.editIndex;
+
+  /* Going back INTO an edit has to reload that account into the draft, or the form
+     renders against whatever the draft happened to hold. Deep-copied, so cancelling
+     out of it again still cannot mutate the saved account. */
+  if (s.editIndex !== null && state.accounts[s.editIndex]) {
+    const a = state.accounts[s.editIndex];
+    state.draft = Object.assign({}, a, { values: Object.assign({}, a.values) });
+  }
+  state.acctErrors = {};
+  state.acctSubmitted = false;
+  modalRoot.innerHTML = '';
+
+  // Re-render for the popped entry without pushing a new one on top of it.
+  suppressPush = true;
+  render();
+  suppressPush = false;
+});
 
 function render() {
   // Guards for hand-edited deep links: review and done are meaningless with no
@@ -935,6 +1014,11 @@ function render() {
   app.innerHTML = SCREENS[state.screen]();
   renderProgress();
   syncDev();
+
+  // A view change is a navigation, so it gets a history entry. A re-render of the
+  // same view does not — otherwise every keystroke that flipped an error message
+  // would need its own press of the back button to get past.
+  if (!sameView && !suppressPush) syncHistory(lastView === null);
 
   if (sameView) {
     if (focusId) {
@@ -1293,7 +1377,7 @@ dev.addEventListener('click', (e) => {
       accounts: [], draft: blankDraft(), editIndex: null,
       substep: 'details', acctErrors: {}, acctSubmitted: false,
       donePhase: 'checker',
-      twoLevel: true, ffcBuild: true, usLabels: true, hints: true, reference: true,
+      twoLevel: true, ffcBuild: true, usLabels: true, hints: true,
     });
     dev.querySelector('#dev-prefill').checked = false;
     modalRoot.innerHTML = '';
@@ -1318,7 +1402,6 @@ dev.addEventListener('change', (e) => {
   if (id === 'dev-ffcbuild') { state.ffcBuild = e.target.checked; return render(); }
   if (id === 'dev-uslabels') { state.usLabels = e.target.checked; return render(); }
   if (id === 'dev-hints') { state.hints = e.target.checked; return render(); }
-  if (id === 'dev-reference') { state.reference = e.target.checked; return render(); }
   if (id === 'dev-prefill') {
     if (e.target.checked) prefillDraft();
     else {
@@ -1342,7 +1425,6 @@ function syncDev() {
   dev.querySelector('#dev-ffcbuild').checked = state.ffcBuild;
   dev.querySelector('#dev-uslabels').checked = state.usLabels;
   dev.querySelector('#dev-hints').checked = state.hints;
-  dev.querySelector('#dev-reference').checked = state.reference;
   dev.querySelector('#dev-twolevel-sub').classList.toggle('is-off', !state.twoLevel);
   dev.querySelector('#dev-country').value = state.draft.country.code;
 

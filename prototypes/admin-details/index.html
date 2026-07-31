@@ -34,7 +34,7 @@
        between "fixed" and "fixed, and the person you sent the link to can see it".
        Only this prototype's own assets carry it; the two shared sheets above
        belong to the other prototypes and are left exactly as they are. -->
-  <link rel="stylesheet" href="app.css?v=5" />
+  <link rel="stylesheet" href="app.css?v=6" />
 </head>
 <body>
 
@@ -110,10 +110,6 @@
         <span>Show “where to find it” hints</span>
       </label>
       <label class="dev__check">
-        <input type="checkbox" id="dev-reference" checked />
-        <span>Show the standard reference-line builder</span>
-      </label>
-      <label class="dev__check">
         <input type="checkbox" id="dev-prefill" />
         <span>Prefill with valid sample data</span>
       </label>
@@ -137,7 +133,8 @@
   </aside>
 
   <!-- ======================================================================
-       MOBILE FRAME — same 390px widget geometry as the other two flows.
+       EMBEDDED FRAME — wide by default (see the width note in app.css), falling
+       back to the same 390px mobile geometry as the other two flows below 900px.
        ==================================================================== -->
   <div class="phone">
     <div class="phone__scroll" id="scroll">
@@ -168,7 +165,7 @@
 <script src="../shared/wireReceive.js"></script>
 <script src="../shared/picker.js"></script>
 <!-- ?v= must match the stylesheet above — see the note in <head>. -->
-<script src="adf.js?v=5"></script>
-<script src="app.js?v=5"></script>
+<script src="adf.js?v=6"></script>
+<script src="app.js?v=6"></script>
 </body>
 </html>

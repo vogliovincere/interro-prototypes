@@ -1,5 +1,5 @@
 /* =============================================================================
-   Interro — Settlement Instructions Onboarding (mobile widget prototype)
+   Interro — Settlement Account Details (embedded widget prototype)
 
    This sheet is a DELTA. It loads after ../capital-call-wire-details/app.css
    (frame, dev panel, buttons, cards, rows, modal, toast) and
@@ -7,9 +7,32 @@
    and reuses both wholesale — the three widgets are one product and must not
    drift apart visually.
 
-   Everything below is specific to what this flow does that the other two do not:
-   hold a LIST of accounts, tag each one, and show two levels of account nesting
-   as a visible hierarchy rather than a flat run of inputs.
+   WIDTH. The other two prototypes are 390px because they were scoped as mobile
+   widgets. This one defaults to a WIDE embedded frame instead, because it is
+   destined for websites rather than phones — an onboarding form a counterparty
+   fills in at a desk, not on the way to a meeting.
+
+   It is a wider frame, NOT a redesign. Same brand, same components, same visual
+   language; the frame grows and the content reflows into it:
+
+     • the frame is min(980px, 100%) — about two and a half times 390px, wide
+       enough to put two short fields on a row and still keep an embedded look
+       rather than becoming a full-bleed page
+     • short, fixed-length fields (identifiers, codes, pickers) pair up two to a
+       row; free-text names and addresses keep the full width, because their
+       length is unpredictable and a cramped address field is worse than a wide one
+     • the reading column is capped so prose never runs to a 900px measure, which
+       is the thing that makes a widened form feel stretched rather than designed
+     • choices and account cards go two-up
+
+   All of it lives behind `@media (min-width: 900px)`. Below that every rule here
+   is inert and the layout falls back to the single-column mobile flow the base
+   sheets already provide — nothing about the responsive behaviour was removed,
+   the wide view was added above it.
+
+   Everything else below is specific to what this flow does that the other two do
+   not: hold a LIST of accounts, tag each one, and show two levels of account
+   nesting as a visible hierarchy rather than a flat run of inputs.
    ========================================================================== */
 
 /* ==========================================================================
@@ -350,48 +373,6 @@
   text-decoration: underline;
 }
 
-/* ==========================================================================
-   The reference line
-   Read-only on purpose: half of it comes from the facility and half is
-   per-payment, so there is nothing here to type. Shown as a code block because
-   it IS a format — the LSTA prints it as three token lines and every paper form
-   leaves it as an empty box someone fills in from memory.
-   ========================================================================== */
-
-.refbuild {
-  margin: 4px 0 20px;
-  padding: 12px 14px;
-  background: #f7f9fb;
-  border: 1px dashed var(--gray-300);
-  border-radius: var(--radius);
-}
-
-.refbuild__label {
-  margin: 0 0 8px;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--gray-500);
-}
-
-.refbuild__body {
-  margin: 0;
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  line-height: 1.65;
-  color: var(--interro-green);
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-.refbuild__note {
-  margin: 9px 0 0;
-  font-size: 11px;
-  line-height: 1.5;
-  color: var(--gray-500);
-}
-
 /* One-tap fill for the FFC name, following the convention the Jamestown form
    writes by hand ("<entity> / Collection Account"). Offered rather than forced:
    a party whose custodian uses a different convention must be able to ignore it. */
@@ -476,3 +457,97 @@
 /* The account list inside a terminal screen inherits centred text from
    .terminal; its rows are data and must read left-aligned. */
 .terminal .acctlist { text-align: left; }
+
+/* The field grid is a plain block until the wide breakpoint takes over. Declared
+   here rather than only inside the media query so the markup is meaningful at any
+   width. */
+.fgrid { display: block; }
+
+/* ==========================================================================
+   DESKTOP EMBEDDED VIEW — the default for this prototype
+   Everything in this block is additive and gated. Below 900px none of it applies
+   and the widget is the same single-column mobile flow as the other two.
+   ========================================================================== */
+
+@media (min-width: 900px) {
+
+  /* The frame. Overriding .phone from the capital-call sheet rather than editing
+     it, because that file belongs to the other two prototypes and they stay at
+     390px. min() keeps this from overflowing a smaller window on the way down to
+     the breakpoint. */
+  .phone {
+    width: min(980px, 100%);
+    min-width: 0;
+    height: 800px;
+    max-height: calc(100vh - 48px);
+    /* 30px reads as a phone bezel; a web embed wants a softer card corner. */
+    border-radius: 18px;
+  }
+
+  /* More generous gutters at width, and a capped reading column. Prose measured
+     across 900px is the single clearest tell of a stretched mobile layout. */
+  .screen { padding: 26px 34px 34px; }
+  .screen > h1 { font-size: 26px; max-width: 30ch; }
+  .intro__lede { font-size: 15.5px; max-width: 68ch; }
+  .fsection__sub, .originnote p, .refnote { max-width: 76ch; }
+
+  /* Two short fields to a row; free text keeps the full width. */
+  .fgrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 24px;
+  }
+  .fgroup--narrow { grid-column: span 1; }
+  .fgroup--wide { grid-column: 1 / -1; }
+  /* An error summary or hint inside the grid must never be boxed into a column. */
+  .fgrid > .errsum, .fgrid > .gotcha { grid-column: 1 / -1; }
+
+  /* Section rules run the full width, so the heading needs to sit clear of the
+     fields rather than tight against them. */
+  .fsection { margin-bottom: 26px; padding-bottom: 24px; }
+  .fsection__title { font-size: 14px; }
+  .fsection--l2 { padding-left: 20px; }
+
+  /* Choices two-up. Four purpose tags become a 2x2 block that can be read at a
+     glance instead of a column that has to be scrolled. */
+  .choices--stacked { grid-template-columns: 1fr 1fr; gap: 12px; }
+  /* The yes/no pair at the end of the accounts page stays full width — they are
+     the only actions on the screen and should not look like a form field. */
+  .choice--action { grid-column: span 1; }
+
+  /* Saved accounts two-up, with the detail rows still readable inside each card. */
+  .acctlist { grid-template-columns: 1fr 1fr; gap: 16px; }
+  .acctlist--compact { grid-template-columns: 1fr 1fr 1fr; }
+  .acctlist__title { grid-column: 1 / -1; }
+
+  /* Actions sit inline at width rather than stacked full-bleed — a 900px-wide
+     primary button looks like a banner, not a button. */
+  .actions {
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+  }
+  .actions .btn { width: auto; min-width: 200px; }
+  .actions .btn--quiet { min-width: 0; }
+
+  /* The review screen's "add another" button is a secondary action in a column of
+     cards, so it keeps its own line and its own width. */
+  #add-more { width: auto; min-width: 240px; }
+
+  /* Terminal screens centre a narrow column inside the wide frame rather than
+     stretching a success message across it. */
+  .terminal { max-width: 620px; margin: 0 auto; }
+  .terminal .acctlist { grid-template-columns: 1fr 1fr; }
+
+  /* The two-step marker gets room to breathe at width. */
+  .substeps { gap: 22px; margin-bottom: 20px; }
+  .substep { font-size: 12px; }
+}
+
+/* NO intermediate breakpoint on purpose. An earlier draft widened the frame to
+   560px between the mobile flow and the wide view, on the assumption that a 390px
+   frame would overflow a small window. Measurement says it does not — the frame is
+   390px centred with room to spare — and all that rule achieved was a middle state
+   where content designed for one column sat stretched across 560px. Below 900px
+   the widget stays exactly the 390px flow the base sheets already give it. */

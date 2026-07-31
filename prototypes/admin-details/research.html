@@ -431,12 +431,39 @@ FFC Account Number    &lt;sub-account&gt;            ← LEVEL 2  (for further c
           <td><span class="pill pill--ok">Evidenced</span></td>
         </tr>
         <tr>
-          <td><strong>Purpose stays out of the account key; the reference line is built for you</strong></td>
-          <td>Follows the convention rather than inventing one. The reference is
-            assembled read-only from the ADF's own token order — the deal half from
-            the facility, the payment half per payment — so nobody has to remember
-            a format that paper forms leave as an empty box.</td>
+          <td><strong>Purpose stays out of the account key</strong></td>
+          <td>Follows the convention rather than inventing one: no
+            principal-versus-interest split, because that distinction belongs in the
+            reference line (§2.3). An earlier build also <em>showed</em> the
+            assembled reference line on the account screen, and that was cut after
+            review — describing what a future payment will carry, on a screen that
+            moves no money, read as though something were being processed. The
+            finding stands; the widget is simply not the place to display it. If it
+            reappears it belongs next to a payment.</td>
           <td><span class="pill pill--ok">Evidenced</span></td>
+        </tr>
+        <tr>
+          <td><strong>Wide embedded frame by default, mobile layout retained below 900px</strong></td>
+          <td>The other two prototypes are 390px because they were scoped as mobile
+            widgets. This one is destined for websites, so it defaults to a 980px
+            embedded frame: short fixed-length fields pair two to a row, free-text
+            names and addresses keep full width, choices and saved accounts go
+            two-up, and the reading column stays capped so prose never runs to a
+            900px measure. It is a wider frame rather than a redesign — same
+            components, same brand. Every wide rule is gated behind a media query,
+            so the single-column mobile flow is intact underneath rather than
+            replaced.</td>
+          <td><span class="pill pill--inf">Design judgment</span></td>
+        </tr>
+        <tr>
+          <td><strong>The browser back button works</strong></td>
+          <td>Each screen change pushes a history entry, so back and forward walk
+            the flow instead of leaving the prototype — which in an embedded context
+            would navigate the host page away. Going back does not unwind saved
+            accounts: back moves between screens, it is not an undo stack. A side
+            benefit is that the URL always reflects the current screen, so any point
+            in the flow can be copied out of the address bar and shared.</td>
+          <td><span class="pill pill--inf">Design judgment</span></td>
         </tr>
         <tr>
           <td><strong>"Add another account?" as a second step on the same page</strong></td>

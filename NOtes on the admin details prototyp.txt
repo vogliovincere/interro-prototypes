@@ -1,0 +1,5 @@
+NOtes on the admin details prototype
+
+-Get rid of the helper lines on the first screen
+-Let them go back
+-Don't tie it to a specific loan
