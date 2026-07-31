@@ -306,9 +306,12 @@
   border: 1px solid #cfe8db;
 }
 
+/* The label column is floored rather than left to `1fr auto`: an FFC account name
+   is long enough to squeeze "FFC account name" into three wrapped lines, which
+   reads as a layout fault. The value wraps instead — it has more room to give. */
 .miniRow {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(38%, max-content) 1fr;
   gap: 10px;
   align-items: baseline;
 }

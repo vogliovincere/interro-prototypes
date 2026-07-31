@@ -1,6 +1,6 @@
 /* =============================================================================
-   Interro — ADF: the data model behind the settlement-instruction onboarding
-   widget (prototypes/admin-details/).
+   Interro — ADF: the data model behind the settlement account-details widget
+   (prototypes/admin-details/).
 
    WHY THIS FILE EXISTS. The capital-call and distribution widgets each collect
    ONE account for ONE payment that is already happening. Private credit does not
@@ -8,6 +8,11 @@
    record, before any particular payment exists — and that record routinely holds
    SEVERAL accounts, because the same entity settles cash and securities in
    different places and may hold a different account per currency.
+
+   SCOPE: ACCOUNTS, NOT PARTIES. Nothing here models the entity. Legal name,
+   entity type, tax status, addresses and contacts belong to the entity master and
+   the KYC flow; this widget consumes a resolved party and collects only the
+   coordinates money can be sent to.
 
    Everything below is derived from four real documents (see research.html for the
    full write-up and the quotations):
@@ -74,26 +79,13 @@
 
 (function () {
 
-  /* ------------------------------------------------------------ entity types */
-
-  /* Verbatim from the AQ's printed list — it is the only one of the four that
-     spells its enum out. The ADF references a list it does not print, and adds
-     "If lender/entity type does not appear in list, you may provide your own
-     value", which is why 'Other' stays at the end with a free-text escape. */
-  window.ADF_ENTITY_TYPES = [
-    'Bank',
-    'Asset Manager',
-    'Broker/Dealer',
-    'CLO/CDO',
-    'Finance Company',
-    'Hedge Fund',
-    'Insurance',
-    'Mutual Fund',
-    'Pension Fund',
-    'Other Regulated Investment Fund',
-    'Special Purpose Vehicle',
-    'Other',
-  ];
+  /* NOTE ON SCOPE. An earlier draft also exported ADF_ENTITY_TYPES — the AQ's
+     printed lender-type enum (Bank, Asset Manager, Broker/Dealer, CLO/CDO, Hedge
+     Fund, Insurance, Special Purpose Vehicle and so on) — for a screen that
+     collected the entity. That screen is gone: this widget is account details
+     only. The enum is recorded in research.html if it is ever wanted for an
+     entity-master form, but it does not belong here and is not exported, because
+     an unused global is a thing the next person has to work out. */
 
   /* ---------------------------------------------------------- account purpose */
 

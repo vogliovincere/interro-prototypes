@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Interro · Settlement Instructions — Research &amp; Design Decisions</title>
+  <title>Interro · Settlement Account Details — Research &amp; Design Decisions</title>
   <link rel="stylesheet" href="../../brand/tokens.css" />
   <style>
     * { box-sizing: border-box; }
@@ -137,7 +137,7 @@
 <header class="top">
   <div class="page">
     <span class="logobadge"><img src="../../brand/interro-logo-knockout.png" alt="interro" /></span>
-    <h1>Settlement Instructions Onboarding<br />Research &amp; Design Decisions</h1>
+    <h1>Settlement Account Details<br />Research &amp; Design Decisions</h1>
     <p>
       What four real private-credit administrative details forms actually contain,
       what the market convention turned out to be, and why the prototype is shaped
@@ -374,7 +374,17 @@ FFC Account Number    &lt;sub-account&gt;            ← LEVEL 2  (for further c
   <p>
     None of that affects where a wire goes. A settlement widget should
     <em>consume</em> a resolved entity, not re-collect its identifiers — which is
-    the reasoning behind the scope decisions in the next section.
+    why this prototype collects <strong>account details only</strong>, across four
+    screens, and asks nothing about the party at all.
+  </p>
+
+  <p>
+    For the record, since it is the only place any of the four forms prints its
+    enum: the 2005 Questionnaire's lender-type list reads
+    <em>Bank, Asset Manager, Broker/Dealer, CLO/CDO, Finance Company, Hedge Fund,
+    Insurance, Mutual Fund, Pension Fund, Other Regulated Investment Fund, Special
+    Purpose Vehicle, Other&nbsp;— please specify</em>. Useful for an entity-master
+    form; not this one.
   </p>
 
   <!-- ================================================================== -->
@@ -450,11 +460,19 @@ FFC Account Number    &lt;sub-account&gt;            ← LEVEL 2  (for further c
           <td><span class="pill pill--ok">Evidenced</span></td>
         </tr>
         <tr>
-          <td><strong>Six party-level fields, and no KYC</strong></td>
-          <td>Legal name, party type, manager, address, country, one operations
-            contact. No LEI, MEI, GIIN, CRN, EIN, tax residence or W-8/W-9 — those
-            belong to the entity master. The party-type list is the 2005
-            Questionnaire's own printed enum, verbatim.</td>
+          <td><strong>No entity fields at all</strong></td>
+          <td>An earlier draft opened with a screen collecting legal name, party
+            type, manager, registered address, country and an operations contact.
+            It is gone. This is a component that does one thing: collect the
+            coordinates money can be sent to. Everything about <em>who</em> the
+            party is belongs to the entity master and the KYC flow, and a widget
+            that re-collects it is both a worse widget and a worse integration.
+            §2.5 is the evidence: the real forms bury one wire block inside pages
+            of identity and tax material, none of which affects where a wire goes.
+            <br /><br />
+            Consequence worth noting: the ADF's <code>SSI Verification</code>
+            contact went with it. If Interro wants that captured here rather than
+            inherited from the party record, it is one optional field on review.</td>
           <td><span class="pill pill--ok">Evidenced</span></td>
         </tr>
         <tr>

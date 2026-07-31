@@ -1,12 +1,23 @@
 /* =============================================================================
-   Interro — Settlement Instructions Onboarding (mobile widget prototype)
+   Interro — Settlement Account Details (mobile widget prototype)
 
-   Five screens inside the same 390px frame as the other two flows:
+   Four screens inside the same 390px frame as the other two flows:
      1. "intro"    — what this is and why it is being asked
-     2. "party"    — who the counterparty is, once
-     3. "accounts" — the repeatable account editor. Two steps on ONE page.
-     4. "review"   — everything read back before it becomes a standing record
-     5. "done"     — submitted, awaiting approval
+     2. "accounts" — the repeatable account editor. Two steps on ONE page.
+     3. "review"   — everything read back before it becomes a standing record
+     4. "done"     — submitted, awaiting approval
+
+   SCOPE: ACCOUNT DETAILS ONLY. An earlier draft opened with a screen collecting
+   the entity — legal name, party type, manager, registered address, country,
+   operations contact. It is gone deliberately. This is a component that does one
+   thing: collect the account coordinates money can be sent to. Everything about
+   WHO the party is belongs to the entity master and the KYC flow, and a widget
+   that re-collects it is a worse widget and a worse integration.
+
+   That also matches what the real forms surround their wire block with — MEI,
+   LEI, GIIN, CRN, EIN, tax residence, UK treaty passport, signature-block
+   drafting, five categories of contact, a W-8/W-9 decision tree. None of it
+   affects where a wire goes. Consume a resolved party; do not re-ask.
 
    HOW THIS DIFFERS FROM THE OTHER TWO WIDGETS, which is the reason it exists.
 
@@ -14,25 +25,25 @@
    distribution widget collects one account, for one distribution that has
    already been declared. Both are anchored to a payment.
 
-   Private credit onboarding is not. A lender publishes its settlement details as
-   a STANDING RECORD, before any particular payment exists, and it holds SEVERAL
-   accounts — because the same entity settles cash and securities in different
-   places and may hold a different account per currency. So:
+   Private credit onboarding is not. Settlement details are published as a
+   STANDING RECORD, before any particular payment exists, and that record holds
+   SEVERAL accounts — because the same party settles cash and securities in
+   different places and may hold a different account per currency. So:
 
      • No payment context. The flow is initiated by onboarding, not by a wire.
        It alludes to what the details will be used for without pretending a
        specific payment is pending.
-     • Accounts are a LIST, not a form. One party, many tagged accounts.
-     • Bank country is per ACCOUNT, not per party — a fund with a USD collection
-       account in New York and a EUR account in Frankfurt is entirely ordinary.
+     • Accounts are a LIST, not a form. Many tagged accounts.
+     • Bank country is per ACCOUNT — a USD collection account in New York
+       alongside a EUR account in Frankfurt is entirely ordinary.
      • Two levels. DDA then FFC. See the long note in adf.js; the short version
-       is that getting level 2 wrong means the wire arrives and is never credited,
-       which is worse than a rejection because nobody gets an error.
+       is that getting level 2 wrong means the wire arrives and is never
+       credited, which is worse than a rejection because nobody gets an error.
 
-   Per-country field sets come from ../shared/wireReceive.js, split into
-   party-level and account-level by adfAccountFields(). Validation is format-only,
-   for the same reason as the other flows: Interro cannot confirm from a form that
-   an account exists, but it can stop a 20-character Swiss IBAN.
+   Per-country field sets come from ../shared/wireReceive.js, filtered to the
+   account-level fields by adfAccountFields(). Validation is format-only, for the
+   same reason as the other flows: Interro cannot confirm from a form that an
+   account exists, but it can stop a 20-character Swiss IBAN.
 
    Sourcing for every design decision: research.html, alongside this file.
    ========================================================================== */
@@ -41,9 +52,9 @@
 
 /* ---------------------------------------------------------------- demo data */
 
-/* The onboarding request comes from a deal, but the details being collected are
-   NOT deal-specific — that tension is the design problem this screen solves, so
-   the demo data carries both. */
+/* The request comes from a deal, but the details being collected are NOT
+   deal-specific — that tension is the design problem this flow solves, so the
+   demo data carries both. */
 const DEAL = {
   agent: 'Interro Agency Services',
   borrower: 'Cedarline Holdings, LLC',
@@ -52,21 +63,7 @@ const DEAL = {
   closing: '14 August 2026',
 };
 
-/* Invented parties. See the note above seedCloExample() for why nothing here is
-   taken from the real forms. */
-const PARTY_PRESETS = {
-  'CLO/CDO': { name: 'Kingsbridge CLO VI Ltd.', manager: 'Ardent Debt Management U.S. LLC' },
-  'Asset Manager': { name: 'Meridian Credit Advisors, LP', manager: '' },
-  'Insurance': { name: 'Brightwater Mutual Life Insurance Co.', manager: '' },
-  'Hedge Fund': { name: 'Halloway Special Situations Master Fund Ltd.', manager: '' },
-};
-
 /* ---------------------------------------------------------------- app state */
-
-const blankParty = () => ({
-  legalName: '', entityType: '', manager: '',
-  street: '', city: '', country: null, opsEmail: '',
-});
 
 const blankDraft = () => ({
   purpose: 'collection',
@@ -82,10 +79,7 @@ const blankDraft = () => ({
 });
 
 const state = {
-  screen: 'intro',       // 'intro' | 'party' | 'accounts' | 'review' | 'done'
-  party: blankParty(),
-  partyErrors: {},
-  partySubmitted: false,
+  screen: 'intro',       // 'intro' | 'accounts' | 'review' | 'done'
 
   accounts: [],          // committed accounts
   draft: blankDraft(),   // the one being edited
@@ -137,7 +131,7 @@ const modalRoot = document.getElementById('modal-root');
   if (q.get('seed') === 'clo') seedCloExample();
 
   const s = q.get('screen');
-  if (['party', 'accounts', 'review', 'done'].includes(s)) state.screen = s;
+  if (['accounts', 'review', 'done'].includes(s)) state.screen = s;
 
   const d = q.get('done');
   if (['checker', 'callback', 'published'].includes(d)) state.donePhase = d;
@@ -172,9 +166,6 @@ const ICON = {
   plus: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
            stroke-linecap="round" aria-hidden="true">
            <path d="M12 5v14"/><path d="M5 12h14"/></svg>`,
-  bank: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
-           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-           <path d="M3 10 12 4l9 6"/><path d="M5 10v9h14v-9"/><path d="M9 19v-5h6v5"/></svg>`,
 };
 
 const escapeAttr = (s) => String(s == null ? '' : s).replace(/"/g, '&quot;');
@@ -185,13 +176,12 @@ const escapeHtml = (s) => String(s == null ? '' : s)
 
 function screenIntro() {
   return `
-    <h1>Register your settlement details</h1>
+    <h1>Add your settlement accounts</h1>
 
     <p class="intro__lede">
-      ${DEAL.agent} needs your standing payment details before ${DEAL.closing}.
-      You are filling this in <strong>once</strong> — it becomes the record every
-      future payment on this facility is settled against, so there is no form to
-      fill in again each time money moves.
+      ${DEAL.agent} needs the accounts to pay you on before ${DEAL.closing}. You
+      are doing this <strong>once</strong> — these become the standing record every
+      future payment on this facility settles against.
     </p>
 
     <section class="card dealcard">
@@ -206,12 +196,10 @@ function screenIntro() {
     </section>
 
     <ol class="steps">
-      <li><strong>Who you are</strong>Legal name, entity type and one operations
-        contact. Asked once.</li>
       <li><strong>Your accounts</strong>As many as you settle through. Tag each one
         so payments land in the right place.</li>
-      <li><strong>Review and submit</strong>Your details go to approval, then become
-        your standing record.</li>
+      <li><strong>Review and submit</strong>They go to approval, then become your
+        standing record.</li>
     </ol>
 
     <div class="originnote">
@@ -219,7 +207,15 @@ function screenIntro() {
       <p>
         Most parties have <strong>more than one account</strong> — a collection
         account for cash and a custody account for securities is the common case.
-        You can add as many as you need.
+        Add as many as you need.
+      </p>
+    </div>
+
+    <div class="originnote">
+      ${ICON.info}
+      <p>
+        Account details only. Nothing here asks about your entity, your tax status
+        or your KYC — ${DEAL.agent} already holds those.
       </p>
     </div>
 
@@ -237,89 +233,6 @@ function screenIntro() {
 }
 
 /* ============================================================== screen 2 === */
-
-/* Party-level fields. Deliberately short. The LSTA forms surround this with LEI,
-   MEI, GIIN, CRN, EIN, tax residence and a W-8/W-9 decision tree — all of which
-   belong to KYC and none of which affects where a wire goes. A settlement widget
-   should consume a resolved entity, not re-collect its identifiers. */
-const PARTY_FIELDS = [
-  {
-    key: 'legalName', label: 'Legal name of the party', us: 'As it appears in the credit agreement',
-    req: 'required', type: 'text', placeholder: 'e.g. Kingsbridge CLO VI Ltd.',
-    hint: 'The legal entity, not the manager. If you are signing for a fund, name the fund.',
-  },
-  {
-    key: 'entityType', label: 'Party type', us: null,
-    req: 'required', type: 'select', options: window.ADF_ENTITY_TYPES,
-    hint: 'The list is the LSTA Administrative Questionnaire\'s own.',
-  },
-  {
-    key: 'manager', label: 'Manager or adviser', us: 'Appears in the signature block',
-    req: 'optional', type: 'text', placeholder: 'e.g. Ardent Debt Management U.S. LLC',
-    hint: 'If the party is managed, who signs on its behalf.',
-  },
-  {
-    key: 'street', label: 'Registered address', us: 'Address line',
-    req: 'required', type: 'text', placeholder: '1301 Fannin Street, Suite 1900',
-    hint: 'A street address. P.O. boxes are rejected by most correspondent banks.',
-  },
-  {
-    key: 'city', label: 'City / town', us: 'Town name',
-    req: 'required', type: 'text', placeholder: 'Houston',
-    hint: 'Required on every cross-border payment under FATF Recommendation 16.',
-  },
-  {
-    key: 'opsEmail', label: 'Operations contact for settlement queries',
-    us: 'Where ops writes when a payment fails',
-    req: 'required', type: 'text', placeholder: 'loanops@example.com',
-    pattern: '^[^@\\s]+@[^@\\s]+\\.[^@\\s]{2,}$',
-    invalid: 'Enter a single email address.',
-    hint: 'A shared mailbox is better than a person — the LSTA form recommends a group.',
-  },
-];
-
-function screenParty() {
-  const errKeys = state.partySubmitted ? Object.keys(state.partyErrors) : [];
-
-  return `
-    <h1>About the party</h1>
-
-    <p class="intro__lede">
-      Asked once, for the entity itself. Your accounts come next.
-    </p>
-
-    ${errKeys.length ? errSummary(errKeys, state.partyErrors, PARTY_FIELDS) : ''}
-
-    <form id="partyform" novalidate>
-      ${PARTY_FIELDS.map((f) => fieldHtml(f, state.party[f.key], state.partyErrors[f.key],
-        state.partySubmitted, 'p')).join('')}
-
-      <div class="fgroup">
-        <label class="flabel" for="party-country-trigger">
-          Country the party is organised in <span class="req">*</span>
-        </label>
-        ${CountryPicker.trigger({
-          selected: state.party.country,
-          placeholder: 'Select country',
-          id: 'party-country-trigger',
-          error: !!state.partyErrors.country && state.partySubmitted,
-        })}
-        ${state.partySubmitted && state.partyErrors.country
-          ? `<p class="ferror">${state.partyErrors.country}</p>`
-          : (state.hints
-            ? `<p class="fhelp">Where the entity is organised — not where it banks.
-                 Those are asked separately and are often different.</p>`
-            : '')}
-      </div>
-    </form>
-
-    <div class="actions">
-      <button class="btn btn--primary" id="party-continue">Continue →</button>
-      <button class="btn btn--quiet" id="party-back">← Back</button>
-    </div>`;
-}
-
-/* ============================================================== screen 3 === */
 
 const acctSchema = () => window.adfAccountFields(state.draft.country.code);
 
@@ -348,8 +261,8 @@ function ownFields() {
     label: 'FFC account name', us: 'For further credit to',
     req: 'required', type: 'text',
     placeholder: 'e.g. Kingsbridge CLO VI Ltd / Collection Account',
-    hint: 'The sub-account the money is applied on to. Convention is your entity '
-      + 'name, then the account\'s purpose.',
+    hint: 'The sub-account the money is applied on to. Convention is the account '
+      + 'holder\'s name, then the account\'s purpose.',
   }, {
     key: 'ffcNumber',
     label: 'FFC account number', us: 'Sub-account number',
@@ -392,19 +305,16 @@ function structureChoices() {
 }
 
 /* The assembled standard reference line. Read-only: the deal half comes from the
-   facility and the payment half is per-payment, so there is nothing here for the
-   party to type. Showing it answers the question the free-text "Reference" field
-   on every paper form leaves open. */
+   facility and the payment half is per-payment, so there is nothing here to type.
+   Showing it answers the question the free-text "Reference" box on every paper
+   form leaves open. */
 function referenceBlock() {
-  const line1 = `${DEAL.borrower}`;
-  const line2 = `${DEAL.facility} ${DEAL.cusip}`;
   const line3 = `${window.adfPurpose(state.draft.purpose).label} [Transaction Reference ID]`;
-
   return `
     <div class="refbuild">
       <p class="refbuild__label">Reference line every payment will carry</p>
-      <pre class="refbuild__body">${escapeHtml(line1)}
-${escapeHtml(line2)}
+      <pre class="refbuild__body">${escapeHtml(DEAL.borrower)}
+${escapeHtml(DEAL.facility + ' ' + DEAL.cusip)}
 ${escapeHtml(line3)}</pre>
       <p class="refbuild__note">
         The LSTA/LMA standard format. Interro fills this in — you do not have to
@@ -483,8 +393,8 @@ function substepDetails() {
         })}
         ${state.hints ? `
           <p class="fhelp">
-            Asked per account, not per party — the fields below change with it.
-            An account in ${d.country.name} needs
+            Asked per account, not once — the fields below change with it. An
+            account in ${d.country.name} needs
             ${s.usesIban ? 'an IBAN' : 'a national routing code, not an IBAN'}.
           </p>` : ''}
       </div>
@@ -519,7 +429,7 @@ function substepDetails() {
           reaches.
         </p>` : ''}
       ${[fields[0]].concat(s.fields).map((f) =>
-        fieldHtml(f, ownOrValue(f.key), state.acctErrors[f.key], state.acctSubmitted, 'a')).join('')}
+        fieldHtml(f, ownOrValue(f.key), state.acctErrors[f.key], state.acctSubmitted)).join('')}
     </section>
 
     ${twoLevel ? `
@@ -530,8 +440,8 @@ function substepDetails() {
           there — credited to nobody, with no error raised.
         </p>
         ${fields.slice(1).map((f) =>
-          fieldHtml(f, ownOrValue(f.key), state.acctErrors[f.key], state.acctSubmitted, 'a')).join('')}
-        ${state.ffcBuild && d.purpose !== 'other' && state.party.legalName ? `
+          fieldHtml(f, ownOrValue(f.key), state.acctErrors[f.key], state.acctSubmitted)).join('')}
+        ${state.ffcBuild && d.purpose !== 'other' && d.accountName.trim() ? `
           <button type="button" class="ffcbuild" id="ffc-build">
             Use “${escapeHtml(suggestedFfcName())}”
           </button>` : ''}
@@ -629,9 +539,13 @@ function setDraftValue(key, val) {
   else state.draft.values[key] = val;
 }
 
+/* Builds the FFC name from the LEVEL 1 account name rather than from a party
+   record — there is no party record any more, and on a custodian structure the
+   level-1 name is the account holder's name anyway, which is exactly what the
+   convention wants in front of the purpose. */
 function suggestedFfcName() {
   const p = window.adfPurpose(state.draft.purpose);
-  return `${state.party.legalName} / ${p.ffcHint}`;
+  return `${state.draft.accountName.trim()} / ${p.ffcHint}`;
 }
 
 function acctTitle(a) {
@@ -719,17 +633,6 @@ function validateField(f, raw) {
   return null;
 }
 
-function validateParty() {
-  const errors = {};
-  PARTY_FIELDS.forEach((f) => {
-    const msg = validateField(f, state.party[f.key]);
-    if (msg) errors[f.key] = msg;
-  });
-  if (!state.party.country) errors.country = 'Select the country the party is organised in.';
-  state.partyErrors = errors;
-  return !Object.keys(errors).length;
-}
-
 function validateAccount() {
   const errors = {};
   ownFields().concat(acctSchema().fields).forEach((f) => {
@@ -743,46 +646,21 @@ function validateAccount() {
   return !Object.keys(errors).length;
 }
 
-/* ============================================================== screen 4 === */
+/* ============================================================== screen 3 === */
 
 function screenReview() {
-  const p = state.party;
+  const n = state.accounts.length;
   return `
     <h1>Review before submitting</h1>
 
     <p class="intro__lede">
-      This becomes ${escapeHtml(p.legalName || 'the party')}'s standing settlement
-      record. Changing it later needs approval, so it is worth a read now.
+      These become the standing settlement record for this facility. Changing them
+      later needs approval, so they are worth a read now.
     </p>
 
-    <section class="card summary instr">
-      <div class="summary__head">The party</div>
-      ${[
-        ['Legal name', p.legalName],
-        ['Party type', p.entityType],
-        ['Manager or adviser', p.manager],
-        ['Registered address', [p.street, p.city].filter(Boolean).join(', ')],
-        ['Organised in', p.country ? p.country.name : ''],
-        ['Operations contact', p.opsEmail],
-      ].filter((r) => r[1]).map((r) => `
-        <div class="row">
-          <div class="row__label">${r[0]}</div>
-          <div class="row__value">${escapeHtml(r[1])}</div>
-        </div>`).join('')}
-      <div class="row">
-        <div class="row__label"></div>
-        <div class="row__value">
-          <button class="linkbtn" id="edit-party">Edit party details</button>
-        </div>
-      </div>
-    </section>
+    <p class="reviewhead">${n} account${n === 1 ? '' : 's'}</p>
 
-    <p class="reviewhead">
-      ${state.accounts.length} account${state.accounts.length === 1 ? '' : 's'}
-    </p>
-
-    ${state.accounts.length
-      ? committedList(false)
+    ${n ? committedList(false)
       : `<div class="gotcha">
            ${ICON.warn}
            <p>No accounts added yet. At least one is needed before you can submit.</p>
@@ -793,20 +671,20 @@ function screenReview() {
     <div class="originnote">
       ${ICON.lock}
       <p>
-        Submitting sends this for approval inside ${DEAL.agent}. You will get a copy,
-        and you will be told before it is used for the first payment.
+        Submitting sends these for approval inside ${DEAL.agent}. You will get a
+        copy, and you will be told before they are used for the first payment.
       </p>
     </div>
 
     <div class="actions">
-      <button class="btn btn--primary" id="submit" ${state.accounts.length ? '' : 'disabled'}>
-        Submit settlement details →
+      <button class="btn btn--primary" id="submit" ${n ? '' : 'disabled'}>
+        Submit account details →
       </button>
       <button class="btn btn--quiet" id="review-back">← Back</button>
     </div>`;
 }
 
-/* ============================================================== screen 5 === */
+/* ============================================================== screen 4 === */
 
 /* Three endings, because which one Interro ships is a policy question this
    prototype is meant to surface rather than answer.
@@ -818,6 +696,7 @@ function screenReview() {
    'checker' is therefore the default and 'callback' is shown for comparison. */
 function screenDone() {
   const n = state.accounts.length;
+  const many = `${n} account${n === 1 ? '' : 's'}`;
 
   if (state.donePhase === 'published') {
     return `
@@ -825,8 +704,7 @@ function screenDone() {
         <div class="terminal__icon">${ICON.check}</div>
         <h1 class="terminal__heading">Published</h1>
         <p class="terminal__sub">
-          ${escapeHtml(state.party.legalName || 'The party')}'s settlement details are
-          live. ${n} account${n === 1 ? '' : 's'} on record, version 1.
+          Your settlement details are live. ${many} on record, version 1.
         </p>
         ${committedList(false)}
         <div class="actions">
@@ -841,18 +719,18 @@ function screenDone() {
         <div class="terminal__icon terminal__icon--wait">${ICON.info}</div>
         <h1 class="terminal__heading">We need to call you</h1>
         <p class="terminal__sub">
-          Before these details can be used, ${DEAL.agent} will call your operations
+          Before these accounts can be used, ${DEAL.agent} will call your operations
           contact on a number already on file to read them back.
         </p>
         <section class="card statuscard">
           <div class="statusrow is-done">
             <span class="statusrow__tick">${ICON.check}</span>
-            <div><p class="statusrow__t">Details received</p></div>
+            <div><p class="statusrow__t">${many} received</p></div>
           </div>
           <div class="statusrow">
             <span class="spinner"></span>
             <div>
-              <p class="statusrow__t">Callback to ${escapeHtml(state.party.opsEmail || 'your ops contact')}</p>
+              <p class="statusrow__t">Callback to your operations contact</p>
               <p class="statusrow__s">Usually within one business day</p>
             </div>
           </div>
@@ -880,10 +758,8 @@ function screenDone() {
       <div class="terminal__icon">${ICON.check}</div>
       <h1 class="terminal__heading">Submitted for approval</h1>
       <p class="terminal__sub">
-        ${n} account${n === 1 ? '' : 's'} for
-        ${escapeHtml(state.party.legalName || 'the party')}. Two people at
-        ${DEAL.agent} review settlement details before they can be used — nobody
-        needs to call you.
+        ${many} received. Two people at ${DEAL.agent} review settlement details
+        before they can be used — nobody needs to call you.
       </p>
 
       <section class="card statuscard">
@@ -928,14 +804,12 @@ function screenDone() {
 
 /* ---------------------------------------------------------- shared field UI */
 
-/* `ns` namespaces the input id so the party and account forms can both be on the
-   page across renders without colliding. */
-function fieldHtml(f, value, err, submitted, ns) {
+function fieldHtml(f, value, err, submitted) {
   const v = value || '';
   const showErr = submitted ? err : null;
   const ok = !showErr && String(v).trim() && !validateField(f, v);
   const id = `f-${f.key}`;
-  const attr = ns === 'p' ? 'data-party' : (OWN_KEYS.has(f.key) ? 'data-own' : 'data-field');
+  const attr = OWN_KEYS.has(f.key) ? 'data-own' : 'data-field';
 
   const chip = f.req === 'conditional'
     ? '<span class="reqchip reqchip--conditional">If you have one</span>'
@@ -988,27 +862,26 @@ function errSummary(keys, errors, fields) {
 
 const SCREENS = {
   intro: screenIntro,
-  party: screenParty,
   accounts: screenAccounts,
   review: screenReview,
   done: screenDone,
 };
 
-const STEP = { intro: 1, party: 2, accounts: 3, review: 4, done: 5 };
+const STEP = { intro: 1, accounts: 2, review: 3, done: 4 };
 
 function renderProgress() {
   const step = STEP[state.screen];
-  progress.innerHTML = Array.from({ length: 5 }, (_, i) =>
+  progress.innerHTML = Array.from({ length: 4 }, (_, i) =>
     `<span class="progress__seg ${i < step ? 'is-on' : ''}"></span>`).join('');
   progress.setAttribute('aria-valuenow', String(step));
 }
 
 function render() {
-  // Guards for hand-edited deep links: review and done are meaningless without
-  // a party, and the "another?" step without a saved account.
-  if ((state.screen === 'review' || state.screen === 'done')
-      && !state.party.legalName && !state.accounts.length) {
-    state.screen = 'party';
+  // Guards for hand-edited deep links: review and done are meaningless with no
+  // accounts, and the "another?" step without a saved one.
+  if ((state.screen === 'review' || state.screen === 'done') && !state.accounts.length) {
+    state.screen = 'accounts';
+    state.substep = 'details';
   }
   if (state.screen === 'accounts' && state.substep === 'another' && !state.accounts.length) {
     state.substep = 'details';
@@ -1023,19 +896,6 @@ function render() {
 /* ------------------------------------------------------------------ events */
 
 app.addEventListener('click', (e) => {
-  if (e.target.closest('#party-country-trigger')) {
-    return CountryPicker.open({
-      root: modalRoot,
-      selected: state.party.country,
-      title: 'Where is the party organised?',
-      onSelect: (c) => {
-        state.party.country = c;
-        delete state.partyErrors.country;
-        render();
-      },
-    });
-  }
-
   if (e.target.closest('#acct-country-trigger')) {
     return CountryPicker.open({
       root: modalRoot,
@@ -1112,30 +972,9 @@ app.addEventListener('click', (e) => {
 
   switch (btn.id) {
     case 'intro-continue':
-      state.screen = 'party';
-      return render();
-
-    case 'party-back':
-      state.screen = 'intro';
-      return render();
-
-    case 'party-continue': {
-      state.partySubmitted = true;
-      if (!validateParty()) {
-        render();
-        return toast('Some details need attention');
-      }
       state.screen = 'accounts';
       state.substep = 'details';
-      // Default the first account's bank country to where the party is organised.
-      // Usually right, always editable, and it saves the commonest interaction.
-      if (!state.accounts.length && state.party.country) {
-        state.draft.country = state.party.country;
-        state.draft.currency = window.adfAccountFields(state.party.country.code).currency
-          || state.draft.currency;
-      }
       return render();
-    }
 
     case 'ffc-build':
       state.draft.ffcName = suggestedFfcName();
@@ -1173,7 +1012,7 @@ app.addEventListener('click', (e) => {
       state.draft = blankDraft();
       state.acctErrors = {};
       state.acctSubmitted = false;
-      state.screen = state.accounts.length ? 'review' : 'party';
+      state.screen = state.accounts.length ? 'review' : 'intro';
       return render();
 
     case 'add-another':
@@ -1206,10 +1045,6 @@ app.addEventListener('click', (e) => {
       state.screen = 'review';
       return render();
 
-    case 'edit-party':
-      state.screen = 'party';
-      return render();
-
     case 'review-back':
       state.screen = 'accounts';
       state.substep = state.accounts.length ? 'another' : 'details';
@@ -1227,19 +1062,12 @@ app.addEventListener('click', (e) => {
 });
 
 app.addEventListener('input', (e) => {
-  const t = e.target;
-  const ds = t.dataset || {};
-
-  if (ds.party) {
-    state.party[ds.party] = t.value;
-    if (state.partySubmitted) liveRevalidate(t, PARTY_FIELDS, state.partyErrors, ds.party);
-    return;
-  }
+  const ds = e.target.dataset || {};
   const key = ds.own || ds.field;
   if (!key) return;
-  setDraftValue(key, t.value);
+  setDraftValue(key, e.target.value);
   if (state.acctSubmitted) {
-    liveRevalidate(t, ownFields().concat(acctSchema().fields), state.acctErrors, key);
+    liveRevalidate(e.target, ownFields().concat(acctSchema().fields), state.acctErrors, key);
   }
 });
 
@@ -1260,17 +1088,11 @@ function liveRevalidate(el, fields, errors, key) {
 }
 
 app.addEventListener('change', (e) => {
-  const t = e.target;
-  if (t.tagName !== 'SELECT') return;
-  const ds = t.dataset || {};
-  if (ds.party) {
-    state.party[ds.party] = t.value;
-    if (state.partySubmitted) validateParty();
-    return render();
-  }
+  if (e.target.tagName !== 'SELECT') return;
+  const ds = e.target.dataset || {};
   const key = ds.own || ds.field;
   if (!key) return;
-  setDraftValue(key, t.value);
+  setDraftValue(key, e.target.value);
   if (state.acctSubmitted) validateAccount();
   return render();
 });
@@ -1294,18 +1116,6 @@ app.addEventListener('change', (e) => {
      • the dashed DDA number, which is why validation strips hyphens
    A flat one-account form cannot represent this party at all. */
 function seedCloExample() {
-  state.party = {
-    legalName: 'Kingsbridge CLO VI Ltd.',
-    entityType: 'CLO/CDO',
-    manager: 'Ardent Debt Management U.S. LLC',
-    street: 'c/o Calder Loan Services, LP, 1301 Fannin Street, Suite 1900',
-    city: 'Houston',
-    country: window.countryByCode('US'),
-    opsEmail: 'notices.kingsbridgeclovi@example.com',
-  };
-  state.partyErrors = {};
-  state.partySubmitted = false;
-
   const trustee = {
     bankName: 'Northgate Agency & Trust - New York',
     aba: '021000021',
@@ -1348,7 +1158,7 @@ function prefillDraft() {
     state.draft.values[f.key] = p && !validateField(f, p) ? p : sampleFor(f);
   });
   const d = state.draft;
-  d.accountName = state.party.legalName || 'Meridian Credit Advisors, LP';
+  d.accountName = 'Kingsbridge CLO VI Ltd.';
   if (state.twoLevel && d.structure === 'omnibus') {
     d.ffcName = suggestedFfcName();
     d.ffcNumber = '220417';
@@ -1364,28 +1174,11 @@ function sampleFor(f) {
   return /A-Za-z/.test(f.pattern) ? 'ABCD'.repeat(n).slice(0, n) : '1'.repeat(n);
 }
 
-function prefillParty() {
-  const preset = PARTY_PRESETS[state.party.entityType] || PARTY_PRESETS['Asset Manager'];
-  state.party = {
-    legalName: preset.name,
-    entityType: state.party.entityType || 'Asset Manager',
-    manager: preset.manager,
-    street: '1301 Fannin Street, Suite 1900',
-    city: 'Houston',
-    country: window.countryByCode('US'),
-    opsEmail: 'loanops@example.com',
-  };
-  state.partyErrors = {};
-}
-
 /* -------------------------------------------------------------- dev tools */
 
 const dev = document.querySelector('.dev');
 
 (function fillDevSelects() {
-  dev.querySelector('#dev-entity').innerHTML = window.ADF_ENTITY_TYPES
-    .map((t) => `<option value="${escapeAttr(t)}">${escapeHtml(t)}</option>`).join('');
-
   dev.querySelector('#dev-country').innerHTML = window.COUNTRIES.map((c) => {
     const verified = !!window.WIRE_RECEIVE[c.code];
     return `<option value="${c.code}">${verified ? '● ' : '○ '}${c.name}</option>`;
@@ -1398,16 +1191,11 @@ dev.addEventListener('click', (e) => {
     const to = nav.dataset.goto;
     // Later screens are meaningless empty, so jumping forward fills what the
     // screen needs to actually show something.
-    if (to === 'review' || to === 'done') {
-      if (!state.party.legalName) prefillParty();
-      if (!state.accounts.length) seedCloExample();
-    }
-    if (to === 'accounts' && !state.party.legalName) prefillParty();
+    if ((to === 'review' || to === 'done') && !state.accounts.length) seedCloExample();
     state.screen = to;
     state.substep = 'details';
     state.editIndex = null;
     state.acctSubmitted = false;
-    state.partySubmitted = false;
     modalRoot.innerHTML = '';
     return render();
   }
@@ -1415,7 +1203,6 @@ dev.addEventListener('click', (e) => {
   const done = e.target.closest('[data-done]');
   if (done) {
     if (!state.accounts.length) seedCloExample();
-    if (!state.party.legalName) prefillParty();
     state.screen = 'done';
     state.donePhase = done.dataset.done;
     return render();
@@ -1439,7 +1226,6 @@ dev.addEventListener('click', (e) => {
   if (e.target.closest('#dev-reset')) {
     Object.assign(state, {
       screen: 'intro',
-      party: blankParty(), partyErrors: {}, partySubmitted: false,
       accounts: [], draft: blankDraft(), editIndex: null,
       substep: 'details', acctErrors: {}, acctSubmitted: false,
       donePhase: 'checker',
@@ -1454,20 +1240,10 @@ dev.addEventListener('click', (e) => {
 dev.addEventListener('change', (e) => {
   const id = e.target.id;
 
-  if (id === 'dev-entity') {
-    state.party.entityType = e.target.value;
-    const preset = PARTY_PRESETS[e.target.value];
-    // Only overwrite the name when the preset has one and nothing has been typed
-    // over it — silently replacing edited input would be hostile.
-    if (preset && (!state.party.legalName || Object.values(PARTY_PRESETS)
-        .some((p) => p.name === state.party.legalName))) {
-      state.party.legalName = preset.name;
-      state.party.manager = preset.manager;
-    }
-    return render();
-  }
   if (id === 'dev-country') {
     state.draft.country = window.countryByCode(e.target.value);
+    state.draft.currency = window.adfAccountFields(state.draft.country.code).currency
+      || state.draft.currency;
     state.draft.values = {};
     state.acctErrors = {};
     state.acctSubmitted = false;
@@ -1480,12 +1256,11 @@ dev.addEventListener('change', (e) => {
   if (id === 'dev-hints') { state.hints = e.target.checked; return render(); }
   if (id === 'dev-reference') { state.reference = e.target.checked; return render(); }
   if (id === 'dev-prefill') {
-    if (e.target.checked) { prefillParty(); prefillDraft(); }
+    if (e.target.checked) prefillDraft();
     else {
-      state.party = blankParty();
       state.draft = blankDraft();
-      state.partyErrors = {}; state.acctErrors = {};
-      state.partySubmitted = false; state.acctSubmitted = false;
+      state.acctErrors = {};
+      state.acctSubmitted = false;
     }
     return render();
   }
@@ -1506,7 +1281,6 @@ function syncDev() {
   dev.querySelector('#dev-reference').checked = state.reference;
   dev.querySelector('#dev-twolevel-sub').classList.toggle('is-off', !state.twoLevel);
   dev.querySelector('#dev-country').value = state.draft.country.code;
-  if (state.party.entityType) dev.querySelector('#dev-entity').value = state.party.entityType;
 
   // Say plainly whether this country has verified requirements or falls back to
   // the generic form — otherwise the fallback looks like a bug.
