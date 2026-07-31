@@ -876,6 +876,10 @@ function renderProgress() {
   progress.setAttribute('aria-valuenow', String(step));
 }
 
+/* Which view was on screen at the end of the last render, so the next one can
+   tell navigation apart from a re-render. */
+let lastView = null;
+
 function render() {
   // Guards for hand-edited deep links: review and done are meaningless with no
   // accounts, and the "another?" step without a saved one.
@@ -887,10 +891,29 @@ function render() {
     state.substep = 'details';
   }
 
+  /* SCROLL. This whole file re-renders the screen from scratch on every state
+     change, which means picking a bank country, choosing a purpose tag, switching
+     the account structure or tripping a validation message all come through here.
+     Scrolling to the top on all of them threw the reader back to the heading every
+     time they touched a control halfway down a long form.
+
+     So: jump to the top only when the VIEW actually changes — a new screen, or the
+     move between the two steps of the account page. A re-render of the same view
+     holds position, because the reader's eye is already where they were working.
+     Set directly rather than smooth-scrolled; an animation back to the same offset
+     is a visible twitch. */
+  const view = `${state.screen}:${state.substep}:${state.editIndex}`;
+  const sameView = view === lastView;
+  const keepY = scroll.scrollTop;
+
   app.innerHTML = SCREENS[state.screen]();
   renderProgress();
   syncDev();
-  scroll.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (sameView) scroll.scrollTop = keepY;
+  else scroll.scrollTo({ top: 0, behavior: 'smooth' });
+
+  lastView = view;
 }
 
 /* ------------------------------------------------------------------ events */
