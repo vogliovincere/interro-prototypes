@@ -172,23 +172,22 @@
 
   /* --------------------------------------------------------- reference line */
 
-  /* The ADF prints a "Standard Wire Reference Format" as three token lines. The
-     asterisk beside it in the PDF points at LSTA guidance that is not reproduced
-     in the document, so the token ORDER below is verbatim but the meaning of
-     each token is our reading.
+  /* ADF_REFERENCE_TOKENS used to live here: the reviewed forms print a standard
+     wire reference format, and screen 3 assembled it from those tokens. Both the
+     data and the UI block are gone. Two reasons, in order of weight:
 
-     This is worth building rather than leaving as free text: the reference line
-     is how a payment gets applied to the right facility, and JT's own reference
-     is a hand-typed template with a bracketed either/or still in it
-     (`Loan Name & [Principal or Interest]`) — i.e. the convention is currently
-     enforced by whoever remembers it. */
-  window.ADF_REFERENCE_TOKENS = [
-    { token: '[Borrower Name]', from: 'deal' },
-    { token: '[Facility Name/Abbr.]', from: 'deal' },
-    { token: '[Facility/Deal CUSIP/ISIN]', from: 'deal' },
-    { token: '[Payment Purpose(s)]', from: 'payment' },
-    { token: '[Transaction Reference ID]', from: 'payment' },
-  ];
+       1. This flow collects standing details and moves no money, so showing the
+          reference a future payment will carry read as though a payment were
+          being processed now.
+       2. Every token in it was facility-scoped — borrower, facility name,
+          CUSIP/ISIN. Nothing in this component is scoped to one loan, and the
+          reference line was the last thing implying otherwise.
+
+     The FINDING behind it still shapes the model and is why there is no
+     principal-versus-interest account split: payment purpose belongs in the
+     reference line of a payment, not in the key of an account. If the reference
+     format is ever surfaced, it belongs next to a payment, not next to an
+     account. See research.html §2.3. */
 
   /* ------------------------------------------------- per-country field split */
 

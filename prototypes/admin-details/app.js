@@ -52,16 +52,16 @@
 
 /* ---------------------------------------------------------------- demo data */
 
-/* The request comes from a deal, but the details being collected are NOT
-   deal-specific — that tension is the design problem this flow solves, so the
-   demo data carries both. */
-const DEAL = {
-  agent: 'Interro Agency Services',
-  borrower: 'Cedarline Holdings, LLC',
-  facility: 'Term Loan B',
-  cusip: '15089TAB2',
-  closing: '14 August 2026',
-};
+/* The requesting institution, and nothing else.
+
+   There was a DEAL object here — borrower, facility, CUSIP, closing date — and a
+   card on screen 1 that displayed it. It is gone deliberately. Settlement
+   accounts are a PARTY-level record: the same account details serve every
+   facility that party is in, and the whole point of collecting them once is that
+   they are not re-collected per loan. Naming a facility on the intro implied the
+   opposite, that this submission belonged to one CUSIP, which is the model this
+   flow is meant to replace. Nothing in the flow is facility-scoped now. */
+const ORG = { agent: 'Interro Agency Services' };
 
 /* ---------------------------------------------------------------- app state */
 
@@ -181,21 +181,10 @@ function screenIntro() {
     <h1>Add your settlement accounts</h1>
 
     <p class="intro__lede">
-      ${DEAL.agent} needs the accounts to pay you on before ${DEAL.closing}. You
-      are doing this <strong>once</strong> — these become the standing record every
-      future payment on this facility settles against.
+      ${ORG.agent} needs the accounts to pay you on. You are doing this
+      <strong>once</strong> — these become the standing record every future payment
+      to you settles against.
     </p>
-
-    <section class="card dealcard">
-      <div class="dealcard__head">
-        <p class="dealcard__borrower">${DEAL.borrower}</p>
-        <p class="dealcard__meta">${DEAL.facility} · CUSIP ${DEAL.cusip}</p>
-      </div>
-      <div class="dealcard__foot">
-        <span class="label">Requested by</span>
-        <span class="value">${DEAL.agent}</span>
-      </div>
-    </section>
 
     <ol class="steps">
       <li><strong>Your accounts</strong>As many as you settle through. Tag each one
@@ -213,13 +202,11 @@ function screenIntro() {
       </p>
     </div>
 
-    <div class="originnote">
-      ${ICON.info}
-      <p>
-        Account details only. Nothing here asks about your entity, your tax status
-        or your KYC — ${DEAL.agent} already holds those.
-      </p>
-    </div>
+    <!-- A third note sat here saying "Account details only. Nothing here asks
+         about your entity, your tax status or your KYC." Cut: three stacked
+         callouts on one screen is one more than the screen can carry, and this
+         one described what the form does NOT do. The absence of entity questions
+         is self-evident from the form itself. -->
 
     <div class="originnote">
       ${ICON.lock}
@@ -657,8 +644,8 @@ function screenReview() {
     <h1>Review before submitting</h1>
 
     <p class="intro__lede">
-      These become the standing settlement record for this facility. Changing them
-      later needs approval, so they are worth a read now.
+      These become your standing settlement record. Changing them later needs
+      approval, so they are worth a read now.
     </p>
 
     <p class="reviewhead">${n} account${n === 1 ? '' : 's'}</p>
@@ -674,7 +661,7 @@ function screenReview() {
     <div class="originnote">
       ${ICON.lock}
       <p>
-        Submitting sends these for approval inside ${DEAL.agent}. You will get a
+        Submitting sends these for approval inside ${ORG.agent}. You will get a
         copy, and you will be told before they are used for the first payment.
       </p>
     </div>
@@ -722,7 +709,7 @@ function screenDone() {
         <div class="terminal__icon terminal__icon--wait">${ICON.info}</div>
         <h1 class="terminal__heading">We need to call you</h1>
         <p class="terminal__sub">
-          Before these accounts can be used, ${DEAL.agent} will call your operations
+          Before these accounts can be used, ${ORG.agent} will call your operations
           contact on a number already on file to read them back.
         </p>
         <section class="card statuscard">
@@ -761,7 +748,7 @@ function screenDone() {
       <div class="terminal__icon">${ICON.check}</div>
       <h1 class="terminal__heading">Submitted for approval</h1>
       <p class="terminal__sub">
-        ${many} received. Two people at ${DEAL.agent} review settlement details
+        ${many} received. Two people at ${ORG.agent} review settlement details
         before they can be used — nobody needs to call you.
       </p>
 
@@ -777,14 +764,14 @@ function screenDone() {
           <span class="spinner"></span>
           <div>
             <p class="statusrow__t">Checker review</p>
-            <p class="statusrow__s">A second approver at ${DEAL.agent}</p>
+            <p class="statusrow__s">A second approver at ${ORG.agent}</p>
           </div>
         </div>
         <div class="statusrow is-pending">
           <span class="statusrow__dot"></span>
           <div>
-            <p class="statusrow__t">Published to the facility</p>
-            <p class="statusrow__s">Usable from ${DEAL.closing}</p>
+            <p class="statusrow__t">Published to your standing record</p>
+            <p class="statusrow__s">Usable as soon as the checker approves</p>
           </div>
         </div>
       </section>
@@ -1012,6 +999,9 @@ function render() {
   }
 
   app.innerHTML = SCREENS[state.screen]();
+  // Lets CSS target one screen without JS knowing anything about layout. Used by
+  // the wide view to centre the short intro inside the tall embedded frame.
+  app.dataset.screen = state.screen;
   renderProgress();
   syncDev();
 
@@ -1278,7 +1268,7 @@ function seedCloExample() {
       accountName: 'Kingsbridge CLO VI Ltd.',
       ffcName: 'Kingsbridge CLO VI Ltd / Collection Account',
       ffcNumber: '220417',
-      special: 'Reference: Loan Name & [Principal or Interest]',
+      special: 'Principal and interest both settle here; purpose goes in the payment reference',
       values: Object.assign({}, trustee),
     },
     {

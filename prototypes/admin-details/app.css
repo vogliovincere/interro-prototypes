@@ -36,53 +36,15 @@
    ========================================================================== */
 
 /* ==========================================================================
-   Screen 1 — the deal that asked
-   Deliberately not an amount card. Nothing is being paid here, and a figure on
-   this screen would imply otherwise. It names the facility instead.
+   Screen 1 — the .dealcard rules are gone
+
+   Screen 1 opened with a card naming the borrower, the facility and its CUSIP,
+   under "Requested by". Removed along with the DEAL data behind it. Settlement
+   accounts are a party-level record and this component is not scoped to a loan,
+   so naming a facility on the intro asserted the opposite of the model. What is
+   left is the lede, the two steps, and two callouts — which is also a calmer
+   first screen than a card plus three stacked notes.
    ========================================================================== */
-
-.dealcard { padding: 0; margin-bottom: 20px; overflow: hidden; }
-
-.dealcard__head { padding: 14px 16px 13px; }
-
-.dealcard__borrower {
-  margin: 0 0 3px;
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--interro-green);
-  line-height: 1.3;
-}
-
-.dealcard__meta {
-  margin: 0;
-  font-size: 12.5px;
-  color: var(--gray-500);
-}
-
-.dealcard__foot {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 11px 16px;
-  background: var(--interro-green-soft);
-  border-top: 1px solid var(--gray-200);
-}
-
-.dealcard__foot .label {
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--interro-green);
-}
-
-.dealcard__foot .value {
-  font-size: 13px;
-  font-weight: 650;
-  color: var(--interro-green);
-  text-align: right;
-}
 
 /* ==========================================================================
    Grouping inside a long form
@@ -543,6 +505,23 @@
   /* The two-step marker gets room to breathe at width. */
   .substeps { gap: 22px; margin-bottom: 20px; }
   .substep { font-size: 12px; }
+
+  /* Screen 1 is now the shortest screen in the flow — the facility card is gone
+     and so is the third callout — and in a fixed 800px frame that left a band of
+     empty white below the button. Centring the block turns it into a deliberate
+     opening panel instead of a screen that ran out of content. Screen 1 only,
+     and width only: every other screen fills the frame on its own, and the
+     mobile flow scrolls rather than fits. The data-screen hook is set in
+     render(); CSS decides the layout, JS knows nothing about it. */
+  #app[data-screen="intro"] {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    padding-bottom: 46px;
+  }
+  #app[data-screen="intro"] .steps { margin: 6px 0 18px; }
+  #app[data-screen="intro"] .originnote + .originnote { margin-top: 12px; }
 }
 
 /* NO intermediate breakpoint on purpose. An earlier draft widened the frame to
