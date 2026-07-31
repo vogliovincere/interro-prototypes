@@ -507,21 +507,72 @@
   .substep { font-size: 12px; }
 
   /* Screen 1 is now the shortest screen in the flow — the facility card is gone
-     and so is the third callout — and in a fixed 800px frame that left a band of
-     empty white below the button. Centring the block turns it into a deliberate
-     opening panel instead of a screen that ran out of content. Screen 1 only,
-     and width only: every other screen fills the frame on its own, and the
-     mobile flow scrolls rather than fits. The data-screen hook is set in
+     and so is the third callout — and in a fixed 800px frame that leaves slack to
+     distribute. An earlier attempt centred the whole thing as one object, which
+     is what put the button in the middle of the frame with dead air beneath it.
+
+     Instead: the reading content is anchored near the top with its own internal
+     rhythm, and .actions is pushed to the bottom with margin-top:auto. The button
+     is the frame's anchor, not the last item in a stack. Space between blocks now
+     varies with the change in register — tight from heading to lede, wider where
+     the screen moves from prose to steps to asides — so five blocks read as three
+     groups rather than one flat list.
+
+     Screen 1 only, and width only: every other screen fills the frame on its own
+     and the mobile flow scrolls rather than fits. The data-screen hook is set in
      render(); CSS decides the layout, JS knows nothing about it. */
   #app[data-screen="intro"] {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: 4px;
-    padding-bottom: 46px;
+    /* Clears the "Powered by" lockup, which is a sibling outside #app. */
+    padding-bottom: 40px;
   }
-  #app[data-screen="intro"] .steps { margin: 6px 0 18px; }
-  #app[data-screen="intro"] .originnote + .originnote { margin-top: 12px; }
+
+  /* The opening screen carries the type one step up from the rest of the flow.
+     It is the only screen with nothing to fill it, and a wide frame set at form
+     scale reads as a form waiting for input rather than an introduction. Larger
+     here means 30px and 16.5px, not display type — the register is a prospectus,
+     not a landing page. */
+  #app[data-screen="intro"] > h1 { font-size: 30px; margin-bottom: 12px; }
+  #app[data-screen="intro"] .intro__lede {
+    font-size: 16.5px;
+    line-height: 1.6;
+    margin-bottom: 38px;
+  }
+  #app[data-screen="intro"] .steps { margin: 0 0 36px; }
+  #app[data-screen="intro"] .steps li { font-size: 14px; padding-bottom: 22px; }
+
+  /* The two callouts stop reading as a matched pair of disclaimers. The first is
+     the one operational fact a reader needs before starting — that accounts are
+     plural — and keeps the card. The second is reassurance rather than
+     instruction, so it drops out of the card into a quiet line. Two identically
+     weighted green boxes made a considered introduction look like small print. */
+  #app[data-screen="intro"] .originnote + .originnote {
+    margin-top: 18px;
+    padding: 0 2px;
+    background: transparent;
+    border: 0;
+  }
+  #app[data-screen="intro"] .originnote + .originnote svg {
+    width: 15px;
+    height: 15px;
+    color: var(--gray-400);
+  }
+  #app[data-screen="intro"] .originnote + .originnote p {
+    font-size: 11.5px;
+    color: var(--gray-500);
+  }
+
+  /* Pushed to the bottom of the frame, and given an edge. margin-top:auto alone
+     left a wide unexplained gap between the last line of text and a button
+     floating near the base. The hairline turns that slack into deliberate space
+     above a footer band, which is how a form that commits something is expected
+     to end. Reading content top, action bottom, a rule between them. */
+  #app[data-screen="intro"] .actions {
+    margin-top: auto;
+    padding-top: 22px;
+    border-top: 1px solid var(--gray-200);
+  }
 }
 
 /* NO intermediate breakpoint on purpose. An earlier draft widened the frame to
