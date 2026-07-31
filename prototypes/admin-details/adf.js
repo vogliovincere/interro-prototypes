@@ -45,14 +45,14 @@
    never credited to the party: it sits unapplied in the custodian's account,
    which is materially worse than a rejection because nobody gets an error.
 
-   Note what is NOT in this model, because the evidence does not support it:
+   Two things this model deliberately does NOT do:
 
-     • FFA. The prototype brief called the second tag "FFA". The term appears in
-       none of the four documents. The pair the market actually writes is
-       DDA -> FFC, and it is a hierarchy, not two sibling account types.
-     • Splitting accounts by principal vs interest. Tempting, and wrong: JT
-       carries both to the SAME collection account and distinguishes them in the
-       reference line — `Reference: Loan Name & [Principal or Interest]`.
+     • Treat DDA and FFC as sibling account types you choose between. They are two
+       levels of one address, so `structure` decides whether an account has a
+       second level at all, and both levels are then collected together.
+     • Split accounts by principal vs interest. Tempting, and wrong: the completed
+       CLO form carries both to the SAME collection account and distinguishes them
+       in the reference line — `Reference: Loan Name & [Principal or Interest]`.
 
    THE PURPOSE TAG. No form has one. JT smuggles the purpose into the account
    NAME as free text — "... / Collection Account", "... / Custody Account" —

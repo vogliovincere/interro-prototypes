@@ -220,13 +220,15 @@
   <!-- ================================================================== -->
   <h2><span class="num">Section 2</span>The five findings that shaped the design</h2>
 
-  <h3>2.1 &nbsp;“FFA” is not the term. The pair is DDA → FFC, and it is a hierarchy.</h3>
+  <h3>2.1 &nbsp;DDA and FFC are not two account types. They are two levels of one address.</h3>
 
   <p>
-    The brief for this prototype named two account-type tags, DDA and FFA. DDA is
-    real and ubiquitous. <strong>FFA appears in none of the four documents.</strong>
-    What the market actually writes is <code>FFC</code> — "for further credit" — and
-    the two are not siblings. They are two levels of the same address:
+    This is the finding the whole prototype is built on, and the easy mistake is to
+    treat <code>DDA</code> and <code>FFC</code> as a pair of sibling tags you pick
+    between. They are not. <code>DDA</code> is the Demand Deposit Account the
+    routing number actually reaches; <code>FFC</code> — "for further credit" — is
+    the sub-account inside it that the money must then be applied on to. One
+    address, two levels, and both are needed:
   </p>
 
 <pre>Name of Bank          &lt;trustee&gt; Agency &amp; Trust - New York
@@ -595,13 +597,6 @@ FFC Account Number    &lt;sub-account&gt;            ← LEVEL 2  (for further c
   </div>
 
   <ul>
-    <li>
-      <strong>Does "FFA" mean anything in this market at all?</strong> It appears
-      in none of the four documents, which is strong but not conclusive — four
-      documents are four documents. If it is real usage somewhere, we have named
-      the concept differently from the people who will use the widget. Worth one
-      question to Janson, who supplied the forms.
-    </li>
     <li>
       <strong>CLO trustee mechanics.</strong> Whether a wire to a CLO should name
       the trustee rather than the issuer as beneficiary, and how the indenture's
