@@ -47,6 +47,23 @@
    ========================================================================== */
 
 /* ==========================================================================
+   Screen 1 — the parts that are not layout
+
+   The wide composition lives in the media query at the end of this sheet. These
+   are the rules the mobile flow needs too: the panel's label, which at 390px is
+   just a section heading above the steps rather than the header of a panel.
+   ========================================================================== */
+
+.intropanel__label {
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gray-400);
+}
+
+/* ==========================================================================
    Grouping inside a long form
    The account screen asks four different kinds of question — what for, how
    held, where, and the numbers. Running them together as twelve unlabelled
@@ -506,73 +523,119 @@
   .substeps { gap: 22px; margin-bottom: 20px; }
   .substep { font-size: 12px; }
 
-  /* Screen 1 is now the shortest screen in the flow — the facility card is gone
-     and so is the third callout — and in a fixed 800px frame that leaves slack to
-     distribute. An earlier attempt centred the whole thing as one object, which
-     is what put the button in the middle of the frame with dead air beneath it.
+  /* ------------------------------------------------------------------ SCREEN 1
 
-     Instead: the reading content is anchored near the top with its own internal
-     rhythm, and .actions is pushed to the bottom with margin-top:auto. The button
-     is the frame's anchor, not the last item in a stack. Space between blocks now
-     varies with the change in register — tight from heading to lede, wider where
-     the screen moves from prose to steps to asides — so five blocks read as three
-     groups rather than one flat list.
+     Screen 1 is the only screen with less content than the frame, so at width it
+     is composed rather than stacked: a statement on the left, a "what happens"
+     panel on the right, the action at the foot of the left column and aligned
+     with the panel's base.
 
-     Screen 1 only, and width only: every other screen fills the frame on its own
-     and the mobile flow scrolls rather than fits. The data-screen hook is set in
-     render(); CSS decides the layout, JS knows nothing about it. */
+     Two earlier attempts are worth recording so they are not repeated. Centring
+     the single stack put the button in the middle of the frame with dead air
+     beneath it. Top-anchoring the text and pinning the button to the floor left
+     about 180px of unexplained white between the last line and the button, and a
+     hairline above the button only drew attention to it. Both were the same
+     mistake: distributing a one-column layout inside a two-axis frame. The
+     content does not fill 980x800 in one column and no amount of spacing makes
+     it. Using the width does.
+
+     Row sizing does the alignment: the lead row takes the slack, the action row
+     is auto, and the panel spans both, so the button lands level with the bottom
+     of the panel whatever either side contains. align-content centres the pair
+     in the frame, which keeps the white space symmetric instead of pooling in
+     one place. */
   #app[data-screen="intro"] {
-    display: flex;
-    flex-direction: column;
-    /* Clears the "Powered by" lockup, which is a sibling outside #app. */
-    padding-bottom: 40px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.04fr);
+    /* Both rows auto, never 1fr. A 1fr row absorbs the frame's free height, which
+       stretches the panel to the full 800px and puts the emptiness INSIDE it.
+       With auto rows the grid is only as tall as its content, the panel spanning
+       both rows distributes its extra height across them, and align-content
+       centres the finished block in the frame. */
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "lead panel"
+      "act  panel";
+    align-content: center;
+    column-gap: 52px;
+    padding-bottom: 26px;
   }
 
-  /* The opening screen carries the type one step up from the rest of the flow.
-     It is the only screen with nothing to fill it, and a wide frame set at form
-     scale reads as a form waiting for input rather than an introduction. Larger
-     here means 30px and 16.5px, not display type — the register is a prospectus,
-     not a landing page. */
-  #app[data-screen="intro"] > h1 { font-size: 30px; margin-bottom: 12px; }
-  #app[data-screen="intro"] .intro__lede {
-    font-size: 16.5px;
-    line-height: 1.6;
-    margin-bottom: 38px;
-  }
-  #app[data-screen="intro"] .steps { margin: 0 0 36px; }
-  #app[data-screen="intro"] .steps li { font-size: 14px; padding-bottom: 22px; }
+  .introlead { grid-area: lead; }
+  .intropanel { grid-area: panel; align-self: stretch; }
+  .introact { grid-area: act; }
 
-  /* The two callouts stop reading as a matched pair of disclaimers. The first is
-     the one operational fact a reader needs before starting — that accounts are
-     plural — and keeps the card. The second is reassurance rather than
-     instruction, so it drops out of the card into a quiet line. Two identically
-     weighted green boxes made a considered introduction look like small print. */
-  #app[data-screen="intro"] .originnote + .originnote {
-    margin-top: 18px;
+  /* The statement carries the type one step up from the rest of the flow. A wide
+     frame set at form scale reads as a form waiting for input rather than an
+     introduction. One step up means 31px and 16.5px, not display type — the
+     register is a prospectus, not a landing page. The measure is held near 34ch
+     so the left column reads as a paragraph rather than a wide ribbon. */
+  .introlead h1 {
+    font-size: 33px;
+    line-height: 1.16;
+    margin: 0 0 16px;
+    max-width: 20ch;
+  }
+  .introlead .intro__lede {
+    font-size: 17px;
+    line-height: 1.68;
+    margin: 0;
+    max-width: 36ch;
+  }
+
+  /* The panel. A single bordered surface holding everything procedural, which is
+     what lets the left column stay a plain statement. Tinted rather than white:
+     on a white screen a white card needs a shadow to exist, and a shadow here
+     would make the panel float in front of the flow instead of sitting beside
+     it. */
+  .intropanel {
+    padding: 28px 30px 26px;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    background: #fbfdfc;
+  }
+
+  .intropanel__label {
+    margin: 0 0 22px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--gray-200);
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--interro-green);
+  }
+
+  .intropanel .steps { margin: 0; }
+  .intropanel .steps li { font-size: 13.5px; padding-bottom: 26px; }
+  .intropanel .steps li:last-child { padding-bottom: 0; }
+
+  /* Inside a bordered panel a second bordered box is noise, so the note keeps
+     its icon and its accent colour and loses its walls. Below 900px it is a
+     normal .originnote and looks exactly as it always did. */
+  .intropanel__note {
+    margin: 24px 0 0;
+    padding: 20px 0 0;
+    background: transparent;
+    border: 0;
+    border-top: 1px solid var(--gray-200);
+    border-radius: 0;
+  }
+
+  /* The action, and beneath it the one line of fine print that is reassurance
+     rather than instruction. It drops out of its box for the same reason a
+     footnote is not a callout. */
+  .introact { align-self: end; }
+  .introact .actions { margin: 0; }
+
+  .finenote {
+    margin: 16px 0 0;
     padding: 0 2px;
     background: transparent;
     border: 0;
   }
-  #app[data-screen="intro"] .originnote + .originnote svg {
-    width: 15px;
-    height: 15px;
-    color: var(--gray-400);
-  }
-  #app[data-screen="intro"] .originnote + .originnote p {
-    font-size: 11.5px;
-    color: var(--gray-500);
-  }
-
-  /* Pushed to the bottom of the frame, and given an edge. margin-top:auto alone
-     left a wide unexplained gap between the last line of text and a button
-     floating near the base. The hairline turns that slack into deliberate space
-     above a footer band, which is how a form that commits something is expected
-     to end. Reading content top, action bottom, a rule between them. */
-  #app[data-screen="intro"] .actions {
-    margin-top: auto;
-    padding-top: 22px;
-    border-top: 1px solid var(--gray-200);
-  }
+  .finenote svg { width: 14px; height: 14px; color: var(--gray-400); }
+  .finenote p { font-size: 11.5px; color: var(--gray-500); }
 }
 
 /* NO intermediate breakpoint on purpose. An earlier draft widened the frame to

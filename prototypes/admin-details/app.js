@@ -176,31 +176,52 @@ const escapeHtml = (s) => String(s == null ? '' : s)
 
 /* ============================================================== screen 1 === */
 
+/* THREE BLOCKS, IN READING ORDER. The wide layout composes them into two columns
+   with CSS grid — statement on the left, what-happens panel on the right, action
+   at the foot of the left column. The markup order is the MOBILE order, so below
+   900px the blocks just stack the way they always did: heading, lede, steps,
+   note, button, fine print. No `order` juggling, no duplicated content.
+
+   An earlier version of this screen was one centred stack of five same-weight
+   blocks in a 980px frame. It left a wide band of empty white and read as a
+   mobile screen that had been stretched. A frame this shape has two axes; the
+   fix was to use the second one.
+
+   The originnote class stays on both notes so the mobile rendering is unchanged;
+   at width the stylesheet neutralises the boxes, because inside a bordered panel
+   a second bordered box is noise. */
 function screenIntro() {
   return `
-    <h1>Add your settlement accounts</h1>
-
-    <p class="intro__lede">
-      ${ORG.agent} needs the accounts to pay you on. You are doing this
-      <strong>once</strong> — these become the standing record every future payment
-      to you settles against.
-    </p>
-
-    <ol class="steps">
-      <li><strong>Your accounts</strong>As many as you settle through. Tag each one
-        so payments land in the right place.</li>
-      <li><strong>Review and submit</strong>They go to approval, then become your
-        standing record.</li>
-    </ol>
-
-    <div class="originnote">
-      ${ICON.layers}
-      <p>
-        Most parties have <strong>more than one account</strong> — a collection
-        account for cash and a custody account for securities is the common case.
-        Add as many as you need.
+    <div class="introlead">
+      <h1>Add your settlement accounts</h1>
+      <p class="intro__lede">
+        ${ORG.agent} needs the accounts to pay you on. You are doing this
+        <strong>once</strong>. These become the standing record every future
+        payment to you settles against.
       </p>
     </div>
+
+    <aside class="intropanel">
+      <p class="intropanel__label">What happens</p>
+
+      <ol class="steps">
+        <li><strong>Your accounts</strong>As many as you settle through. Tag each
+          one so payments land in the right place.</li>
+        <li><strong>Review and submit</strong>Everything read back to you before
+          anything is sent.</li>
+        <li><strong>Approval</strong>A second approver checks the details, then
+          they become your standing record.</li>
+      </ol>
+
+      <div class="originnote intropanel__note">
+        ${ICON.layers}
+        <p>
+          Most parties have <strong>more than one account</strong> — a collection
+          account for cash and a custody account for securities is the common
+          case. Add as many as you need.
+        </p>
+      </div>
+    </aside>
 
     <!-- A third note sat here saying "Account details only. Nothing here asks
          about your entity, your tax status or your KYC." Cut: three stacked
@@ -208,16 +229,17 @@ function screenIntro() {
          one described what the form does NOT do. The absence of entity questions
          is self-evident from the form itself. -->
 
-    <div class="originnote">
-      ${ICON.lock}
-      <p>
-        These details are used to send money <em>to</em> you. Nothing is charged and
-        no payment is initiated by this form.
-      </p>
-    </div>
-
-    <div class="actions">
-      <button class="btn btn--primary" id="intro-continue">Get started →</button>
+    <div class="introact">
+      <div class="actions">
+        <button class="btn btn--primary" id="intro-continue">Get started →</button>
+      </div>
+      <div class="originnote finenote">
+        ${ICON.lock}
+        <p>
+          These details are used to send money <em>to</em> you. Nothing is charged
+          and no payment is initiated by this form.
+        </p>
+      </div>
     </div>`;
 }
 
