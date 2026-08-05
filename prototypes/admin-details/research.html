@@ -431,6 +431,20 @@ FFC Account Number    &lt;sub-account&gt;            ← LEVEL 2  (for further c
           <td><span class="pill pill--ok">Evidenced</span></td>
         </tr>
         <tr>
+          <td><strong>No checking-or-savings question</strong></td>
+          <td>The US field set inherited from the distribution widget asks it as a
+            required select. A wire does not need the answer: Fedwire routes on the
+            ABA and applies on the account number, and the message carries no
+            deposit-type field. The question is real on retail ACH forms, where the
+            type is part of the instruction, and it stays in the shared schema
+            because the distribution widget collects from individuals. Here the
+            counterparties are trustees, custodians and CLOs, so the answer is
+            "checking" every time — a required field with one possible answer is
+            friction that buys nothing and implies the wire could be
+            misrouted without it.</td>
+          <td><span class="pill pill--inf">Design judgment</span></td>
+        </tr>
+        <tr>
           <td><strong>Purpose stays out of the account key</strong></td>
           <td>Follows the convention rather than inventing one: no
             principal-versus-interest split, because that distinction belongs in the

@@ -41,9 +41,11 @@
        credited, which is worse than a rejection because nobody gets an error.
 
    Per-country field sets come from ../shared/wireReceive.js, filtered to the
-   account-level fields by adfAccountFields(). Validation is format-only, for the
-   same reason as the other flows: Interro cannot confirm from a form that an
-   account exists, but it can stop a 20-character Swiss IBAN.
+   account-level fields by adfAccountFields() — which also drops the US
+   checking-or-savings select, since a wire does not route on deposit type.
+   Validation is format-only, for the same reason as the other flows: Interro
+   cannot confirm from a form that an account exists, but it can stop a
+   20-character Swiss IBAN.
 
    Sourcing for every design decision: research.html, alongside this file.
    ========================================================================== */
@@ -1280,7 +1282,6 @@ function seedCloExample() {
     bankName: 'Northgate Agency & Trust - New York',
     aba: '021000021',
     account: '4417-2830',
-    accountType: 'Checking',
   };
 
   state.accounts = [

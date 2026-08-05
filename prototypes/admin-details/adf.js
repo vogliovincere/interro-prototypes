@@ -196,13 +196,25 @@
      belong to two different owners:
 
        the PARTY  — legal name and registered address. Asked once.
-       the ACCOUNT — bank name, routing identifier, account number, account type,
-                     and any purpose code the local regulator mandates. Asked per
+       the ACCOUNT — bank name, routing identifier, account number, and any
+                     purpose code the local regulator mandates. Asked per
                      account, because a party may hold several.
 
      Asking for the registered address once per account would be the most obvious
      possible tell that the form does not understand its own data. */
   const PARTY_KEYS = new Set(['name', 'street', 'city', 'postcode', 'state']);
+
+  /* Account-level fields this widget still drops. `accountType` — the US
+     checking-or-savings select — is not needed to send a wire: Fedwire routes on
+     the ABA and applies on the account number, and neither carries a deposit-type
+     flag. It survives on retail ACH forms, where the type genuinely is part of
+     the instruction, and on the distribution widget, which shares this schema and
+     collects from individuals. The counterparties here are trustees, custodians
+     and CLOs, so the answer is "checking" every time it is asked — a required
+     field with one real answer is friction that buys nothing. See research.html
+     §3. Kept out here rather than deleted from wireReceive.js, because the other
+     prototype has a reason to ask. */
+  const ACCOUNT_OMIT_KEYS = new Set(['accountType']);
 
   /* `name` in wireReceive means "name on the account". In the two-level case
      that is the CUSTODIAN's account name, not the party's, so it cannot be
@@ -215,7 +227,8 @@
       currency: schema.currency,
       usesIban: schema.usesIban,
       gotcha: schema.gotcha,
-      fields: schema.fields.filter((f) => !PARTY_KEYS.has(f.key)),
+      fields: schema.fields.filter(
+        (f) => !PARTY_KEYS.has(f.key) && !ACCOUNT_OMIT_KEYS.has(f.key)),
     };
   };
 
